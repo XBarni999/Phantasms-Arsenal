@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.3 — 2026-10-08
+
+- Added DL→GPS to copy a selected datalink target's known HQ coordinate into a new GPS mark.
+- Added persistent key rebinding and native topography toggling in the game's Settings screen. Removed the always-visible I-TGT launcher.
+- Suppressed camera pan/tilt/zoom commands while the pointer is over I-TGT or resizing it, preserving flight input.
+- Replaced the own-aircraft cross with a silhouette and contrasting nose tip.
+- Keep the generated native map layer opaque when the game reapplies its theme tint.
+- Added a Ukrainian usage guide and cleaned the installed weapon compatibility table of UFO/event placeholders and external fuel tanks.
+
+## 1.1.2 — 2026-10-08
+
+- Moved GPS delivery cues above the flight HUD as small text without a background or accent panel.
+- Removed the arbitrary minimum-distance delivery warning that incorrectly rejected successful close guided-bomb releases.
+- Added a GPS-specific native cluster-dispenser approach check requiring an actual exposed enemy surface unit near the mark. Coordinate guidance alone no longer depends on datalink position accuracy to activate dispensing after visual observation; native deployment and submunition selection remain in use.
+- Export loaded weapon definitions, actual seeker types, GPS compatibility and dispenser requirements to `BepInEx/config/Phantasms-Arsenal-GPS-weapons.csv`.
+
 ## 1.1.1 — 2026-10-08
 
 - Restyled I-TGT buttons with inset faces, borders, shadows, hover/press feedback and accents for GPS and binding controls.

@@ -28,6 +28,22 @@ The bomb test verifies the launch coordinate, not an accurate impact. It used an
 
 ## Manual acceptance checks
 
+### 1.1.3 follow-up
+
+The user reported a vanilla guided cluster bomb acquiring and hitting a real target during their test. This is user-observed flight feedback; no separate automatic casing/submunition deployment trace was captured.
+
+1.1.3 adds datalink-coordinate import, Settings-screen key rebinding, removal of the launcher, camera-axis interception and an aircraft silhouette. The native camera code was inspected: it reads `Rewired.Player.GetAxis("Zoom View"/"Pan View"/"Tilt View")`; only these actions are suppressed over I-TGT, without skipping camera follow/physics or flight input. Generated native-map tint is reapplied as opaque white to counter native mode/theme recolouring.
+
+The Release build passed with zero errors/warnings. Build, `dist` and installed DLL match SHA-256 `57C6696288CB4D249BDFF83FAC3C27B228949765D4383EA4EC062CE95306FDD1`. A restarted game logged Arsenal 1.1.3 and completed its weapon snapshot without an I-TGT startup exception. After plugin loading the raw snapshot contained 281 definitions; the published weapon-only table has 213 rows (78 adapter-compatible, 135 incompatible), including guns. UFO definitions, external fuel tanks and non-weapon equipment/cargo were filtered from the published table.
+
+Settings layout/rebinding persistence, DL→GPS interaction, mouse pan/zoom isolation and the transparency correction still need interactive confirmation. A manual input notification interrupted the attempted Settings UI check; no visual pass is claimed for these changes.
+
+### 1.1.2 follow-up
+
+The HUD is now small unboxed text at 32% of screen height. The arbitrary minimum-range warning was removed. Source inspection of the installed game's `SubmunitionDispenser.TargetApproachCheck` established that its native deployment requires a real target ID, accurate HQ tracking, range and line of sight. GPS coordinates alone cannot meet that gate. The new GPS-specific check requires a real enemy surface unit near the captured coordinate, within the native deployment distance, with direct line of sight; it invokes the native `Missile.Damage` path so native casing/submunition behavior remains authoritative. No synthetic target or forced opening over empty coordinates is introduced.
+
+The first 1.1.2 candidate compiled and initialized in the restarted game without an I-TGT error. Its runtime exporter captured 150 loaded weapon definitions with projectile prefabs after Blueprinter loading (79 eligible, 71 ineligible). An expanded exporter now includes definitions without prefabs, including guns. Current build/dist SHA-256 is `ED3288D4BAC7BD7A718EA17C9FC569E6B8E949C24EFC71764551B8426AEF75FF`, with zero compiler errors/warnings. Interactive cluster deployment and HUD placement remain unverified; the user's successful earlier guided-bomb impact is feedback about the preceding build, not verification of this dispenser fix.
+
 1. Create several terrain marks. Bind a TYPE default, override one PYLON, then override one STORE on that pylon. Verify STORE > PYLON > TYPE precedence, native release order, and that an unassigned compatible next store is held while GPS is armed. Fire a weapon, then change the active mark; verify its in-flight aim point stays on the captured designation. Rearm and verify individual store assignments were consumed.
 2. Drop guided bombs within their physical delivery envelope onto stationary coordinates; compare impact error with native delivery. Verify ordinary unguided stores cannot be bound.
 3. Launch an optical missile toward a mark with an exposed enemy surface unit nearby. Verify terminal acquisition requires range, line of sight and field of view, with no friendly or aerial acquisition.

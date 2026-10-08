@@ -66,6 +66,8 @@ namespace PhantasmsArsenal.ITGT
                 image.color = originalColor;
                 attached = false;
             }
+            // Native map mode/theme changes can reapply a translucent tint after attachment.
+            if (attached && image && image.sprite == generated) image.color = Color.white;
         }
 
         void CopyBaseImage()

@@ -29,6 +29,7 @@ namespace PhantasmsArsenal.ITGT
         Rect window, mapRect;
         bool visible, armed, resizing;
         bool positioned;
+        bool capturingKey;
         int selected, nextID = 1;
         Vector2 center;
         float span = 40000;
@@ -36,14 +37,13 @@ namespace PhantasmsArsenal.ITGT
         string message = "LMB: mark   RMB: pan   Wheel: zoom";
         Mark Active => marks.Count > 0 ? marks[Mathf.Clamp(selected, 0, marks.Count - 1)] : null;
         public static Aircraft Aircraft => SceneSingleton<CombatHUD>.i ? SceneSingleton<CombatHUD>.i.aircraft : null;
-        static Rect Launcher => new Rect(Mathf.Max(8, Screen.width - 112), 80, 96, 30);
         public static bool PointerOverDisplay
         {
             get
             {
                 if (!instance || !Aircraft) return false;
                 var mouse = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
-                return Launcher.Contains(mouse) || (instance.visible && instance.window.Contains(mouse));
+                return instance.visible && (instance.window.Contains(mouse) || instance.resizing);
             }
         }
         internal static void Trace(string value) => Log.LogInfo(value);
@@ -88,9 +88,36 @@ namespace PhantasmsArsenal.ITGT
             window = new Rect(Mathf.Max(8, Screen.width - windowWidth.Value - 24), 120, windowWidth.Value, windowHeight.Value);
             harmony = new Harmony("ua.ncmod.arsenal.itgt");
             Guidance.Install(harmony);
+            harmony.Patch(AccessTools.Method(typeof(SettingsMenu), "Start"), postfix: new HarmonyMethod(typeof(Display), nameof(SettingsOpened)));
+            harmony.Patch(AccessTools.Method(typeof(Rewired.Player), "GetAxis", new[] { typeof(string) }), prefix: new HarmonyMethod(typeof(Display), nameof(CameraAxis)));
+        }
+        static bool CameraAxis(string __0, ref float __result)
+        {
+            if (!PointerOverDisplay || (__0 != "Zoom View" && __0 != "Pan View" && __0 != "Tilt View")) return true;
+            __result = 0; return false;
+        }
+        static void SettingsOpened(SettingsMenu __instance) { __instance.gameObject.AddComponent<GPSSettingsPanel>(); }
+        public sealed class GPSSettingsPanel : MonoBehaviour
+        {
+            void OnGUI() { if (instance && instance.button != null) instance.DrawSettings(); }
+            void OnDestroy() { if (instance) instance.capturingKey = false; }
+        }
+        void DrawSettings()
+        {
+            var panel = new Rect(Screen.width - 336, Screen.height - 178, 312, 144);
+            Fill(panel, new Color(.075f, .10f, .09f, .97f));
+            GUI.Label(new Rect(panel.x + 12, panel.y + 8, 288, 24), "I-TGT GPS SETTINGS", label);
+            if (Button(new Rect(panel.x + 12, panel.y + 40, 288, 30), capturingKey ? "PRESS KEY  /  ESC CANCELS" : "OPEN / CLOSE: " + toggle.Value)) capturingKey = true;
+            if (Button(new Rect(panel.x + 12, panel.y + 78, 288, 26), "NATIVE TOPO MAP: " + (replaceMap.Value ? "ON" : "OFF"))) replaceMap.Value = !replaceMap.Value;
+            GUI.Label(new Rect(panel.x + 12, panel.y + 110, 288, 22), "Binding saves automatically", small);
+            var e = Event.current;
+            if (!capturingKey || e.type != EventType.KeyDown || e.keyCode == KeyCode.None) return;
+            if (e.keyCode != KeyCode.Escape) { toggle.Value = e.keyCode; GetComponent<ArsenalPlugin>().Config.Save(); }
+            capturingKey = false; e.Use();
         }
         void Update()
         {
+            WeaponInventory.Update();
             var aircraft = Aircraft;
             if (aircraft != lastAircraft || missionOrigin != Datum.origin)
             {
@@ -110,7 +137,7 @@ namespace PhantasmsArsenal.ITGT
                 return;
             }
             topography.Update(SceneSingleton<DynamicMap>.i, replaceMap.Value);
-            if (Input.GetKeyDown(toggle.Value)) SetVisible(!visible);
+            if (!capturingKey && !CursorManager.GetFlag(CursorFlags.GameMenu) && Input.GetKeyDown(toggle.Value)) SetVisible(!visible);
             if (visible && Input.GetKeyDown(KeyCode.Escape)) SetVisible(false);
         }
         void SetVisible(bool value)
@@ -125,7 +152,6 @@ namespace PhantasmsArsenal.ITGT
         }
         void OnGUI()
         {
-            if (!Aircraft || Aircraft.disabled) return;
             var previousColor = GUI.color;
             var previousBackground = GUI.backgroundColor;
             try
@@ -140,8 +166,8 @@ namespace PhantasmsArsenal.ITGT
                     button.active.textColor = new Color(.45f, 1f, .78f);
                 }
                 GUI.backgroundColor = new Color(.18f, .21f, .19f);
+                if (!Aircraft || Aircraft.disabled) return;
                 DrawFlightCue();
-                if (Button(Launcher, "I-TGT  " + toggle.Value)) SetVisible(!visible);
                 if (!visible) return;
                 window.width = Mathf.Clamp(window.width, 480, Mathf.Max(480, Screen.width - 16));
                 window.height = Mathf.Clamp(window.height, 540, Mathf.Max(540, Screen.height - 16));
@@ -197,6 +223,7 @@ namespace PhantasmsArsenal.ITGT
             if (Button(new Rect(14, 256, 43, 34), "TGT") && Active != null) center = new Vector2(Active.point.x, Active.point.z);
             if (Button(new Rect(14, 304, 43, 34), "TOPO")) replaceMap.Value = !replaceMap.Value;
             if (Button(new Rect(14, 352, 43, 34), "SCOPE")) bindingScope = (BindingScope)(((int)bindingScope + 1) % 3);
+            if (Button(new Rect(14, 400, 43, 34), "DL→GPS")) ImportDatalink();
             if (Button(new Rect(w - 57, 352, 43, 34), "SLOT") && stores.Count > 0) selectedStore = (selectedStore + 1) % stores.Count;
             if (Button(new Rect(w - 57, 112, 43, 34), "PREV") && marks.Count > 0) selected = (selected + marks.Count - 1) % marks.Count;
             if (Button(new Rect(w - 57, 160, 43, 34), "NEXT") && marks.Count > 0) selected = (selected + 1) % marks.Count;
@@ -264,6 +291,17 @@ namespace PhantasmsArsenal.ITGT
             marks.Remove(removed); selected = Mathf.Clamp(selected, 0, Mathf.Max(0, marks.Count - 1));
             if (marks.Count == 0) { armed = false; nextID = 1; selected = 0; message = "All marks cleared: next mark is T01"; }
         }
+        void ImportDatalink()
+        {
+            var targets = Aircraft.weaponManager?.GetTargetList();
+            var target = targets != null && targets.Count > 0 ? targets[0] : null;
+            if (!target || !Aircraft.NetworkHQ) { message = "Select a Data Link target first"; return; }
+            var known = Aircraft.NetworkHQ.GetKnownPosition(target);
+            if (!known.HasValue) { message = "Data Link has no known target position"; return; }
+            if (marks.Count >= 16) { message = "16 marks maximum: delete a mark first"; return; }
+            marks.Add(new Mark { id = nextID++, point = known.Value }); selected = marks.Count - 1;
+            message = "Data Link position copied: BIND then ARM";
+        }
         void Zoom(float factor) => span = Mathf.Clamp(span * factor, 1000, Mathf.Max(topography.Size.x, 80000));
         void DrawMap()
         {
@@ -301,8 +339,11 @@ namespace PhantasmsArsenal.ITGT
             var own = Pixel(Aircraft.GlobalPosition());
             var matrix = GUI.matrix;
             GUIUtility.RotateAroundPivot(Aircraft.transform.eulerAngles.y, own);
-            Fill(new Rect(own.x - 2, own.y - 8, 4, 16), new Color(.12f, .35f, .8f));
-            Fill(new Rect(own.x - 8, own.y - 2, 16, 3), new Color(.12f, .35f, .8f)); GUI.matrix = matrix;
+            var aircraftColor = new Color(.08f, .25f, .65f);
+            Fill(new Rect(own.x - 2, own.y - 9, 4, 18), aircraftColor);
+            Fill(new Rect(own.x - 8, own.y - 1, 16, 3), aircraftColor);
+            Fill(new Rect(own.x - 5, own.y + 6, 10, 2), aircraftColor);
+            Fill(new Rect(own.x - 1, own.y - 13, 2, 4), Color.white); GUI.matrix = matrix;
             GUI.Label(new Rect(width - 30, 5, 30, 22), "N ↑");
             GUI.EndGroup();
             var e = Event.current;
@@ -359,12 +400,10 @@ namespace PhantasmsArsenal.ITGT
                 if (float.IsNaN(maxRange) || float.IsInfinity(maxRange) || maxRange <= 0) maxRange = ballisticRange;
                 // Native range estimation plus a conservative delivery window, not an impact guarantee.
                 float deliveryRange = info.glideBomb ? maxRange * .85f : Mathf.Min(maxRange, ballisticRange);
-                float minimum = info.glideBomb ? deliveryRange * .25f : deliveryRange * .7f;
                 bool aligned = Mathf.Abs(angle) <= 8 && closing > 30;
                 if (height < 50) status = "CLIMB / TOO LOW";
                 else if (!aligned) status = angle < 0 ? "TURN LEFT" : "TURN RIGHT";
                 else if (distance > deliveryRange) status = "TOO FAR / HOLD";
-                else if (distance < minimum) status = "TOO CLOSE / PASS AGAIN";
                 else { status = "RELEASE WINDOW ~"; color = new Color(.4f, 1f, .65f); }
                 rangeText = $"  /  EST RANGE {deliveryRange / 1000:0.0} km";
             }
@@ -389,13 +428,10 @@ namespace PhantasmsArsenal.ITGT
             GUI.matrix = matrix;
             var saved = GUI.color; GUI.color = color;
             GUI.Label(new Rect(Mathf.Clamp(point.x - 85, 0, Screen.width - 170), point.y + 13, 170, 24), $"GPS T{mark.id:00}  {distance / 1000:0.0} km" + (onScreen ? "" : " / OFFSCREEN"), small);
-            var panel = new Rect(Screen.width / 2f - 245, Screen.height * .76f, 490, 54);
-            GUI.color = saved;
-            Fill(panel, new Color(.035f, .06f, .05f, .78f));
-            Fill(new Rect(panel.x, panel.y, 3, panel.height), color);
+            var panel = new Rect(Screen.width / 2f - 245, Screen.height * .32f, 490, 42);
             GUI.color = color;
-            GUI.Label(new Rect(panel.x + 8, panel.y + 3, panel.width - 16, 24), $"GPS T{mark.id:00}  /  {status}", label);
-            GUI.Label(new Rect(panel.x + 8, panel.y + 27, panel.width - 16, 23), $"{distance / 1000:0.0} km  /  HDG {(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg + 360) % 360:000}°{rangeText}", small);
+            GUI.Label(new Rect(panel.x + 8, panel.y, panel.width - 16, 20), $"GPS T{mark.id:00}  /  {status}", small);
+            GUI.Label(new Rect(panel.x + 8, panel.y + 20, panel.width - 16, 20), $"{distance / 1000:0.0} km  /  HDG {(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg + 360) % 360:000}°{rangeText}", small);
             GUI.color = saved;
         }
         void ClampCenter()

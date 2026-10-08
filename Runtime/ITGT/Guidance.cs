@@ -55,6 +55,29 @@ namespace PhantasmsArsenal.ITGT
             }
             harmony.Patch(AccessTools.Method(typeof(OpticalSeekerCruiseMissile), "PreTerminalMode"), prefix: new HarmonyMethod(typeof(Guidance), nameof(PreTerminal)));
             harmony.Patch(AccessTools.Method(typeof(OpticalSeekerCruiseMissile), "SlowChecks"), prefix: new HarmonyMethod(typeof(Guidance), nameof(CruiseChecks)));
+            harmony.Patch(AccessTools.Method(typeof(SubmunitionDispenser), "TargetApproachCheck"), prefix: new HarmonyMethod(typeof(Guidance), nameof(ClusterApproach)));
+        }
+
+        static bool ClusterApproach(SubmunitionDispenser __instance)
+        {
+            var flight = __instance.GetComponent<CoordinateFlight>();
+            if (!flight || !flight.Missile || !flight.Missile.IsServer || flight.Missile.disabled) return true;
+            if ((bool)AccessTools.Field(typeof(SubmunitionDispenser), "dispensed").GetValue(__instance)) return false;
+            flight.Step();
+            var target = flight.Seeker ? TargetUnit.GetValue(flight.Seeker) as Unit : null;
+            float radius = (float)AccessTools.Field(typeof(SubmunitionDispenser), "detectionRange").GetValue(__instance);
+            float distance = (float)AccessTools.Field(typeof(SubmunitionDispenser), "dispenseDistance").GetValue(__instance);
+            // A coordinate is not a fabricated Unit. Require an actual exposed enemy near the designation.
+            if (!target || target.disabled || target is Aircraft || target is Missile || target is Scenery ||
+                !target.NetworkHQ || target.NetworkHQ == flight.Missile.NetworkHQ || target.speed > 60 ||
+                (target.GlobalPosition() - flight.Point).sqrMagnitude > radius * radius ||
+                (target.GlobalPosition() - flight.Missile.GlobalPosition()).sqrMagnitude > distance * distance ||
+                !target.LineOfSight(flight.transform.position, 1000)) return false;
+            flight.Missile.SetTarget(target);
+            byte id = (byte)AccessTools.Field(typeof(SubmunitionDispenser), "dmgID").GetValue(__instance);
+            flight.Missile.Damage(id, new DamageInfo(0, 0, 0, 1));
+            Display.Trace("I-TGT cluster deployment at observed target: " + target.unitName);
+            return false;
         }
 
         static bool Guns(WeaponManager __instance) => !Display.PointerOverDisplay || __instance.GetComponentInParent<Aircraft>() != Display.Aircraft;
@@ -217,13 +240,15 @@ namespace PhantasmsArsenal.ITGT
             if (Seeker is OpticalSeeker) AccessTools.Method(Seeker.GetType(), "CalcDistAndTimeToTarget").Invoke(Seeker, null);
             if ((Point - Missile.GlobalPosition()).sqrMagnitude > terminal * terminal) return;
             float radius = Mathf.Clamp(Guidance.Number(Seeker, "terminalSearchRadius", Guidance.Number(Seeker, "searchRadius", 300)), 25, 1000);
+            var dispenser = Missile.GetComponent<SubmunitionDispenser>();
+            if (dispenser) radius = Mathf.Min(radius, (float)AccessTools.Field(typeof(SubmunitionDispenser), "detectionRange").GetValue(dispenser));
             float best = radius * radius;
             Unit chosen = null;
             candidates.Clear();
             BattlefieldGrid.GetUnitsInRangeNonAlloc(Point, radius, candidates);
             foreach (var unit in candidates)
             {
-                if (!unit || unit.disabled || unit is Missile || unit is Aircraft || !unit.NetworkHQ || !Missile.NetworkHQ || unit.NetworkHQ == Missile.NetworkHQ) continue;
+                if (!unit || unit.disabled || unit is Missile || unit is Aircraft || unit is Scenery || !unit.NetworkHQ || !Missile.NetworkHQ || unit.NetworkHQ == Missile.NetworkHQ || (dispenser && unit.speed > 60)) continue;
                 float distance = (unit.GlobalPosition() - Point).sqrMagnitude;
                 if (distance >= best || !unit.LineOfSight(transform.position, 1000)) continue;
                 if (Vector3.Angle(unit.transform.position - transform.position, transform.forward) > Guidance.Number(Seeker, "searchAngle", 90)) continue;
