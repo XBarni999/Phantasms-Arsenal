@@ -35,6 +35,7 @@ namespace CircuitBreaker
             if(revision.Value<3){Duration.Value=4;revision.Value=3;Config.Save();}
             if(revision.Value<5){MineLife.Value=210;revision.Value=5;Config.Save();}
             harmony=new Harmony("ua.ncmod.circuitbreaker");
+            Patch(typeof(Hardpoint),"SpawnMount",nameof(EclipseDispenserMount),false);
             Patch(typeof(Missile),"StartMissile",nameof(Started),false);
             Patch(typeof(MountedMissile),"Fire",nameof(Launch));
             harmony.Patch(AccessTools.Method(typeof(Spawner),"SpawnMissile",new[]{typeof(GameObject),typeof(Vector3),typeof(Quaternion),typeof(Vector3),typeof(Unit),typeof(Unit)}),postfix:new HarmonyMethod(typeof(Plugin),nameof(Spawned)));
@@ -118,6 +119,21 @@ namespace CircuitBreaker
             if(target&&Suppression.IsActivator(target)&&target.NetworkHQ&&target.NetworkHQ!=owner.NetworkHQ)return true;
             if(owner==Datalink.LocalAircraft&&Time.time>=nextTargetNotice){nextTargetNotice=Time.time+3;var report=SceneSingleton<AircraftActionsReport>.i;if(report)report.ReportText("Blackout: select an enemy ground radar / SAM.",3);}
             return false;
+        }
+        static void EclipseDispenserMount(Aircraft aircraft,WeaponMount weaponMount,GameObject __result){
+            if(!aircraft||!aircraft.definition||aircraft.definition.jsonKey!="Aryx_Interceptor1"||!weaponMount||!weaponMount.info||!__result)return;
+            string key=weaponMount.info.name;
+            if(key!="WI_Locust"&&key!="WI_LawnChair")return;
+            // Mounted dispensers must not push the carrier's articulated wing bodies.
+            // Fired missiles are separate instances and retain their normal collisions.
+            var mounted=__result.GetComponentsInChildren<Collider>(true);
+            var carrier=aircraft.GetComponentsInChildren<Collider>(true);
+            int pairs=0;
+            foreach(var bomb in mounted)foreach(var part in carrier){
+                if(!bomb||!part||bomb==part||part.transform.IsChildOf(__result.transform))continue;
+                Physics.IgnoreCollision(bomb,part,true);pairs++;
+            }
+            Diagnostic?.Invoke("Eclipse dispenser self-collision isolation: "+key+", pairs="+pairs);
         }
         static bool StationFire(WeaponStation __instance,Unit owner,Unit target){if(!BlackoutTargetAllowed(__instance,owner,target))return false;if(owner is Aircraft aircraft&&!(__instance.WeaponInfo?.gun??false))return Datalink.CanLaunch(aircraft,target,__instance.WeaponInfo);return !Suppression.ActiveUnit(owner)||(__instance.WeaponInfo?.gun??false);}
         static bool MountAccess(WeaponStation __instance,Unit owner,Unit target)=>BlackoutTargetAllowed(__instance,owner,target)&&(!(owner is Aircraft aircraft)||Datalink.CanLaunch(aircraft,target,__instance.WeaponInfo));

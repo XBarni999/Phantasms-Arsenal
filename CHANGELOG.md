@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2 — 2026-10-08
+
+- Isolated Locust and Lawn Chair mounted-dispenser colliders from their own FS-41 Eclipse carrier to prevent contact forces against articulated wing bodies.
+- Kept carrier wing control, mount mass and drag, external collisions and separately spawned dispenser/mine collisions unchanged.
+- Added an Eclipse dispenser collision-isolation diagnostic to the BepInEx log. The reported reversed-wing behavior still needs an in-mission retest with this build.
+- Reused the verified 1.0.1 weapon bundle; this update changes runtime collision handling only.
+
 ## 1.0.1 — 2026-10-08
 
 - Reduced Blackout's prefab scale by 5%, including its collider, for additional ground clearance. In-mission clearance verification remains pending.
