@@ -4,7 +4,7 @@ Current release: v0.1.21 (early testing). Locust deployment and Blackout suppres
 
 Source code and documentation for a Nuclear Option tactical weapons mod. The playable pack is delivered as one `Circuit-Breaker.dll`, containing the gameplay runtime and an embedded Blueprinter bundle.
 
-This repository contains code, build scripts, tests, text documentation and rendered gallery images. Models, textures, icons, materials, prefabs, Unity metadata, game assemblies and compiled artifacts are not included. A configured local asset workspace or an existing Blueprinter bundle is required to build the playable mod.
+This pack contains editable Blueprinter assets. Its runtime source is in the Arsenal repository's Runtime/CircuitBreaker folder; shared build and installation instructions are in the main README. Game assemblies are not redistributed.
 
 ## Weapon gallery
 
@@ -109,33 +109,6 @@ Compatibility is serialized through Blueprinter carrier operations. These new ai
 
 Place the verified `Circuit-Breaker.dll` in `BepInEx/plugins`. Do not also install its embedded `.nobp` separately. Peers should use the same DLL for multiplayer.
 
-## Building
+## Source in Phantasm's Arsenal
 
-For a runtime-only build, supply the intended local bundle as `Tools~/Runtime/Bundle/CircuitBreaker.nobp`, along with the matching game and Blueprinter reference assemblies, then run:
-
-```powershell
-& './Tools~/Build.ps1' -GameDir 'D:/Games/Nuclear Option' -BlueprinterProject 'D:/Mods/Blueprinter-Editor'
-```
-
-The script builds Release, verifies the embedded bundle SHA-256 against the input, and writes `Delivery~/Circuit-Breaker.dll` and a hash report. Runtime and bundle versions can differ when an unchanged approved bundle is reused.
-
-To update visuals, use a complete local Blueprinter asset workspace in Unity 2022.3.62f3. The editor code provides a build-only action that packages existing assets. Avoid regenerating weapons or racks over manually edited icons, exhaust and pylon placement. This repository alone cannot reconstruct the omitted visual assets.
-
-`Tools~/AuditBundle.py` checks the actual UnityFS bundle and requires Python with UnityPy. `Tools~/Tests` contains numerical guidance and HPM activation/scope checks. Game assemblies and local bundles must not be committed.
-
-## Source layout
-
-- `Editor`: local Unity/Blueprinter asset-generation and packaging code.
-- `Tools~/Runtime`: launch designation, guidance, collision handling, suppression, receiver-specific datalink filtering and mines.
-- `Tools~/Tests`: focused standalone policy and numerical checks.
-- `Tools~/Build.ps1`: verified single-DLL packaging.
-- `Tools~/PrepareRepository.ps1`: prepares an isolated publishing checkout with code and text only.
-
-## Validation
-
-The startup regression test executes all seven production configuration bindings against the installed BepInEx library, including migration of the old 18-second recovery setting. Versions v0.1.12-v0.1.14 contain an invalid equal-min/max range that can abort plugin initialization; update to v0.1.15.
-This project is an unofficial community modification and is not affiliated with, sponsored by, or endorsed by Shockfront Studios Pty Ltd. Original Nuclear Option assets, vehicle designs, audio, and code are Copyright (c) 2026 Shockfront Studios Pty Ltd. All rights reserved. Nuclear Option and Shockfront Studios are trademarks or registered trademarks of Shockfront Studios Pty Ltd. Original mod content and all other trademarks belong to their respective owners.
-
-Release compilation, bundle/reference checks, embedded-resource hashes and focused numerical/policy tests are structural evidence. Earlier user mission tests confirmed ground air-defense suppression. The latest launch-target activation, aircraft datalink filtering, collision cleanup and multiplayer behavior still require mission verification.
-
-This is a community mod and is not affiliated with the game's developers.
+The editable assets for this pack are in this pack's neighboring folders. Its runtime is in the Arsenal repository's `Runtime/CircuitBreaker` folder. Use the combined pack's [editing guide](../../../../../docs/EDITING.md) for build instructions.

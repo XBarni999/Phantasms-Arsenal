@@ -44,8 +44,9 @@ Runtime C# belongs under the repository's `Runtime` folders. Gameplay scripts ar
 ## Build
 
 1. Save the edited assets.
-2. Choose **Blueprinter → Phantasm's Arsenal → Build weapon bundle**.
-3. Run `./Build.ps1` in the Arsenal repository.
-4. Install the DLL, restart the game, and test the changed weapon in a mission.
+2. Open Blueprinter's standard Mod Builder and select `PhantasmsArsenal`.
+3. Use display name `Phantasm's Arsenal` and version `1.0.0`, then copy the output into the repository's `Bundles` folder.
+4. Run `dotnet build Runtime/Arsenal.csproj -c Release`, setting game and Blueprinter reference paths for your installation.
+5. Install `Runtime/bin/Release/net472/Phantasms-Arsenal.dll`, restart the game, and test the changed weapon in a mission.
 
-To regenerate screenshots, choose **Blueprinter → Phantasm's Arsenal → Render weapon gallery**. Camera and lighting changes affect the preview only.
+When updating the repository after editing in Unity, copy the mod folder together with its `.meta` files into `UnityAssets/PhantasmsArsenal`.

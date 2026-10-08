@@ -27,10 +27,10 @@ All images are rendered from the editable weapon prefabs in Unity. See [the gall
 
 The editable pack lives at `Assets/Blueprinter/Mods/PhantasmsArsenal` in the Blueprinter project. See [the editing guide](docs/EDITING.md) for folders and weapon locations. The repository's `UnityAssets/PhantasmsArsenal` contains the same editable assets, with unique Unity GUIDs.
 
-Use **Blueprinter → Phantasm's Arsenal → Build weapon bundle**, then run `./Build.ps1`. The finished bundle is embedded in the DLL and verified against its source SHA-256.
+Build the edited `PhantasmsArsenal` folder with Blueprinter's standard Mod Builder, using display name `Phantasm's Arsenal` and version `1.0.0`. Place the resulting `.nobp` in `Bundles`, then compile with `dotnet build Runtime/Arsenal.csproj -c Release`. Game and Blueprinter reference paths can be set with `-p:GameDir` and `-p:BlueprinterProject`. The output is `Runtime/bin/Release/net472/Phantasms-Arsenal.dll`; it embeds the bundle.
 
 The DLL preserves each pack's runtime plugin and configuration identity. A single embedded Blueprinter bundle contains the combined assets and operations.
 
 ## Validation
 
-Build, asset references and embedded bundle verification are recorded under `verification`. Package verification does not establish live mission behavior. A combined loadout/launch test is still required.
+Release compilation and source/embedded bundle SHA-256 checks passed when the package was prepared. A combined loadout/launch test is still required.

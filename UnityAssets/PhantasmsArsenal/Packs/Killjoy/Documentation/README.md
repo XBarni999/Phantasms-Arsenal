@@ -39,12 +39,6 @@ This is the first public binary release. In-game testing by the author confirms 
 
 See [CHANGELOG.md](CHANGELOG.md) for the release features.
 
-## Building from source
+## Source in Phantasm's Arsenal
 
-Place this repository at `Assets/Blueprinter/Mods/Kh47M2` in a configured Blueprinter Editor project. The internal folder and asset IDs retain the Kh47M2/Kinzhal names for compatibility.
-
-1. In Unity, select **Blueprinter > HSM-290 Killjoy > Build bundle**.
-2. Build `Tools~/Runtime/Kinzhal/Kinzhal.csproj` in Release mode, adjusting game/assembly paths for your installation.
-3. Run `Tools~/Package.ps1` to verify the embedded bundle and prepare the DLL and ZIP.
-
-Original game assemblies and donor assets are required locally and are not included. **Create or update assets** regenerates content; use **Build bundle** to package the existing tuned assets.
+The editable assets are in this pack's neighboring folders. Runtime source is in the Arsenal repository's `Runtime/Killjoy` folder. Follow the combined pack's [editing guide](../../../../../docs/EDITING.md) to build the Arsenal DLL. Internal Kh47M2/Kinzhal IDs are retained for compatibility.
