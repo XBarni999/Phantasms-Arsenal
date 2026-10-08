@@ -135,10 +135,13 @@ namespace PhantasmsArsenal.ITGT
                     label = new GUIStyle(GUI.skin.label) { fontSize = 15, alignment = TextAnchor.MiddleCenter };
                     label.normal.textColor = new Color(.77f, .89f, .77f);
                     small = new GUIStyle(label) { fontSize = 12 };
-                    button = new GUIStyle(GUI.skin.button) { fontSize = 12, alignment = TextAnchor.MiddleCenter };
+                    button = new GUIStyle(label) { fontSize = 11, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
+                    button.hover.textColor = Color.white;
+                    button.active.textColor = new Color(.45f, 1f, .78f);
                 }
                 GUI.backgroundColor = new Color(.18f, .21f, .19f);
-                if (GUI.Button(Launcher, "I-TGT  " + toggle.Value, button)) SetVisible(!visible);
+                DrawFlightCue();
+                if (Button(Launcher, "I-TGT  " + toggle.Value)) SetVisible(!visible);
                 if (!visible) return;
                 window.width = Mathf.Clamp(window.width, 480, Mathf.Max(480, Screen.width - 16));
                 window.height = Mathf.Clamp(window.height, 540, Mathf.Max(540, Screen.height - 16));
@@ -148,7 +151,18 @@ namespace PhantasmsArsenal.ITGT
             }
             finally { GUI.color = previousColor; GUI.backgroundColor = previousBackground; }
         }
-        bool Button(Rect rect, string title) => GUI.Button(rect, title, button);
+        bool Button(Rect rect, string title)
+        {
+            bool hover = rect.Contains(Event.current.mousePosition);
+            bool down = hover && Input.GetMouseButton(0);
+            bool accent = title.Contains("GPS ON") || (title == "GPS" && armed) || title == "BIND";
+            Fill(new Rect(rect.x + 2, rect.y + 3, rect.width, rect.height), new Color(0, 0, 0, .35f));
+            Fill(rect, hover ? new Color(.43f, .62f, .55f) : new Color(.27f, .35f, .32f));
+            Fill(new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2), down ? new Color(.10f, .18f, .15f) :
+                accent ? new Color(.16f, .32f, .25f) : hover ? new Color(.24f, .32f, .29f) : new Color(.17f, .22f, .20f));
+            Fill(new Rect(rect.x + 3, rect.y + 2, rect.width - 6, 1), new Color(.65f, .8f, .71f, down ? .1f : .3f));
+            return GUI.Button(rect, title, button);
+        }
         void Fill(Rect rect, Color color)
         {
             var saved = GUI.color; GUI.color = color; GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = saved;
@@ -248,7 +262,7 @@ namespace PhantasmsArsenal.ITGT
             foreach (var key in new List<Hardpoint>(pylonAssignments.Keys)) if (pylonAssignments[key] == removed) pylonAssignments.Remove(key);
             foreach (var key in new List<MountedMissile>(storeAssignments.Keys)) if (storeAssignments[key] == removed) storeAssignments.Remove(key);
             marks.Remove(removed); selected = Mathf.Clamp(selected, 0, Mathf.Max(0, marks.Count - 1));
-            if (marks.Count == 0) armed = false;
+            if (marks.Count == 0) { armed = false; nextID = 1; selected = 0; message = "All marks cleared: next mark is T01"; }
         }
         void Zoom(float factor) => span = Mathf.Clamp(span * factor, 1000, Mathf.Max(topography.Size.x, 80000));
         void DrawMap()
@@ -315,6 +329,74 @@ namespace PhantasmsArsenal.ITGT
                 }
                 e.Use();
             }
+        }
+        void DrawFlightCue()
+        {
+            var aircraft = Aircraft;
+            var station = aircraft.weaponManager?.currentWeaponStation;
+            var mark = armed ? Assignment(Guidance.NextStore(station)) : Active;
+            var cameraManager = SceneSingleton<CameraStateManager>.i;
+            var camera = cameraManager ? cameraManager.mainCamera : null;
+            if (mark == null || !camera || !aircraft.rb) return;
+            var delta = mark.point - aircraft.GlobalPosition();
+            var horizontal = new Vector3(delta.x, 0, delta.z);
+            float distance = horizontal.magnitude;
+            var velocity = aircraft.rb.velocity;
+            var flatVelocity = new Vector3(velocity.x, 0, velocity.z);
+            float closing = Vector3.Dot(flatVelocity, horizontal.normalized);
+            float angle = flatVelocity.sqrMagnitude > 1 ? Vector3.SignedAngle(flatVelocity, horizontal, Vector3.up) : 0;
+            string status = armed ? "GPS TARGET" : "PREVIEW / GPS OFF";
+            Color color = new Color(.9f, .76f, .35f);
+            string rangeText = "";
+            var info = station?.WeaponInfo;
+            if (armed && info && (info.bomb || info.glideBomb))
+            {
+                float height = -delta.y;
+                float fallTime = Kinematics.FallTime(Mathf.Max(0, height), velocity.y);
+                float ballisticRange = Mathf.Max(0, closing) * fallTime;
+                var missile = info.weaponPrefab.GetComponent<Missile>();
+                float maxRange = missile ? missile.CalcRange(flatVelocity.magnitude, aircraft.GlobalPosition().y, mark.point.y, distance, 0, out _) : ballisticRange;
+                if (float.IsNaN(maxRange) || float.IsInfinity(maxRange) || maxRange <= 0) maxRange = ballisticRange;
+                // Native range estimation plus a conservative delivery window, not an impact guarantee.
+                float deliveryRange = info.glideBomb ? maxRange * .85f : Mathf.Min(maxRange, ballisticRange);
+                float minimum = info.glideBomb ? deliveryRange * .25f : deliveryRange * .7f;
+                bool aligned = Mathf.Abs(angle) <= 8 && closing > 30;
+                if (height < 50) status = "CLIMB / TOO LOW";
+                else if (!aligned) status = angle < 0 ? "TURN LEFT" : "TURN RIGHT";
+                else if (distance > deliveryRange) status = "TOO FAR / HOLD";
+                else if (distance < minimum) status = "TOO CLOSE / PASS AGAIN";
+                else { status = "RELEASE WINDOW ~"; color = new Color(.4f, 1f, .65f); }
+                rangeText = $"  /  EST RANGE {deliveryRange / 1000:0.0} km";
+            }
+            var projected = camera.WorldToScreenPoint(mark.point.ToLocalPosition());
+            var point = new Vector2(projected.x, Screen.height - projected.y);
+            bool onScreen = projected.z > 0 && point.x > 60 && point.x < Screen.width - 60 && point.y > 100 && point.y < Screen.height - 100;
+            if (!onScreen)
+            {
+                var direction = new Vector2(projected.x - Screen.width / 2f, Screen.height / 2f - projected.y);
+                if (projected.z < 0) direction = -direction;
+                if (direction.sqrMagnitude < 1) direction = Vector2.up;
+                float factor = Mathf.Min((Screen.width / 2f - 70) / Mathf.Max(Mathf.Abs(direction.x), 1),
+                    (Screen.height / 2f - 110) / Mathf.Max(Mathf.Abs(direction.y), 1));
+                point = new Vector2(Screen.width / 2f, Screen.height / 2f) + direction * factor;
+            }
+            var matrix = GUI.matrix;
+            GUIUtility.RotateAroundPivot(45, point);
+            Fill(new Rect(point.x - 9, point.y - 9, 18, 2), color);
+            Fill(new Rect(point.x - 9, point.y + 7, 18, 2), color);
+            Fill(new Rect(point.x - 9, point.y - 9, 2, 18), color);
+            Fill(new Rect(point.x + 7, point.y - 9, 2, 18), color);
+            GUI.matrix = matrix;
+            var saved = GUI.color; GUI.color = color;
+            GUI.Label(new Rect(Mathf.Clamp(point.x - 85, 0, Screen.width - 170), point.y + 13, 170, 24), $"GPS T{mark.id:00}  {distance / 1000:0.0} km" + (onScreen ? "" : " / OFFSCREEN"), small);
+            var panel = new Rect(Screen.width / 2f - 245, Screen.height * .76f, 490, 54);
+            GUI.color = saved;
+            Fill(panel, new Color(.035f, .06f, .05f, .78f));
+            Fill(new Rect(panel.x, panel.y, 3, panel.height), color);
+            GUI.color = color;
+            GUI.Label(new Rect(panel.x + 8, panel.y + 3, panel.width - 16, 24), $"GPS T{mark.id:00}  /  {status}", label);
+            GUI.Label(new Rect(panel.x + 8, panel.y + 27, panel.width - 16, 23), $"{distance / 1000:0.0} km  /  HDG {(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg + 360) % 360:000}°{rangeText}", small);
+            GUI.color = saved;
         }
         void ClampCenter()
         {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 — 2026-10-08
+
+- Restyled I-TGT buttons with inset faces, borders, shadows, hover/press feedback and accents for GPS and binding controls.
+- Reset mark numbering to T01 after deleting every mark, while preserving surviving mark identities and assignments.
+- Added a world-position GPS diamond, an off-screen edge marker, target distance and bearing. Preview shows the selected mark; armed GPS shows the actual next store's assignment.
+- Added approximate bomb release cues using current altitude, velocity, heading and the native weapon range calculation: turn toward the target, climb, hold, release window, or pass again. The cue is advisory and does not alter native safeties or release order. Accuracy and HUD presentation require live validation.
+
 ## 1.1.0 — 2026-10-08
 
 - Added an I-TGT GPS targeting MFD with a dark bezel, side buttons, grid, own-aircraft marker, up to 16 coordinate marks, zoom, pan, drag and resize. Open it with F6 or the I-TGT button during flight.

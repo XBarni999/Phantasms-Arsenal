@@ -18,6 +18,12 @@ After the user's pixelation feedback, terrain resolution was increased from 512Ã
 
 ## Limits of this verification
 
+### 1.1.1 follow-up
+
+Button restyling, empty-list numbering reset and GPS HUD/release cues compiled with zero errors/warnings. Build, `dist` and installed DLL match SHA-256 `099DBF7EE55F4AA784BC1BE347539AFB6A53B983A735E535609827D4B38E9339`. Installation happened while the game was closed. A restarted game logged Arsenal 1.1.1 initialization without an I-TGT startup error. Interactive validation was left pending while the user was operating other foreground applications; these changes have not yet been checked in a live mission.
+
+HUD acceptance: delete T01 and T02, then create a new mark and verify T01; check the diamond from cockpit/external views and with the point behind the aircraft; verify armed HUD follows the next store's assignment rather than the selected preview. Compare bomb cues at different heights/speeds, with a target ahead, behind and laterally displaced. Verify too-far and green-window releases against actual impacts, separately for ordinary guided bombs and glide bombs. The estimate does not predict wind or intervening terrain, and must remain labelled approximate.
+
 The bomb test verifies the launch coordinate, not an accurate impact. It used an arbitrary sea coordinate and did not establish terminal target acquisition. Optical/cruise/ballistic/laser weapon families, Blackout GPS activation, repeated releases, native-target mode restoration, drag/resize, other terrain maps and multiplayer-host behavior still need dedicated mission coverage. Remote-client GPS release is deliberately unavailable in this version.
 
 ## Manual acceptance checks
