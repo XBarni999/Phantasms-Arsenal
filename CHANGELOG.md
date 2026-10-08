@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3 — 2026-10-08
+
+- Corrected Eclipse dispenser collision isolation to include registered aircraft parts reparented outside the aircraft transform hierarchy. Version 1.0.2 missed these articulated bodies and did not resolve the reported wing reversal.
+- Reapply isolation after part initialization and rearming; detached aircraft parts and separately spawned missiles retain normal collision behavior.
+- Log registered-part and collision-pair counts for verification. In-mission confirmation remains pending.
+
 ## 1.0.2 — 2026-10-08
 
 - Isolated Locust and Lawn Chair mounted-dispenser colliders from their own FS-41 Eclipse carrier to prevent contact forces against articulated wing bodies.

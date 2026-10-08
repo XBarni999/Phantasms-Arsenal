@@ -124,16 +124,8 @@ namespace CircuitBreaker
             if(!aircraft||!aircraft.definition||aircraft.definition.jsonKey!="Aryx_Interceptor1"||!weaponMount||!weaponMount.info||!__result)return;
             string key=weaponMount.info.name;
             if(key!="WI_Locust"&&key!="WI_LawnChair")return;
-            // Mounted dispensers must not push the carrier's articulated wing bodies.
-            // Fired missiles are separate instances and retain their normal collisions.
-            var mounted=__result.GetComponentsInChildren<Collider>(true);
-            var carrier=aircraft.GetComponentsInChildren<Collider>(true);
-            int pairs=0;
-            foreach(var bomb in mounted)foreach(var part in carrier){
-                if(!bomb||!part||bomb==part||part.transform.IsChildOf(__result.transform))continue;
-                Physics.IgnoreCollision(bomb,part,true);pairs++;
-            }
-            Diagnostic?.Invoke("Eclipse dispenser self-collision isolation: "+key+", pairs="+pairs);
+            var guard=__result.GetComponent<EclipseMountCollisions>()??__result.AddComponent<EclipseMountCollisions>();
+            guard.Bind(aircraft);
         }
         static bool StationFire(WeaponStation __instance,Unit owner,Unit target){if(!BlackoutTargetAllowed(__instance,owner,target))return false;if(owner is Aircraft aircraft&&!(__instance.WeaponInfo?.gun??false))return Datalink.CanLaunch(aircraft,target,__instance.WeaponInfo);return !Suppression.ActiveUnit(owner)||(__instance.WeaponInfo?.gun??false);}
         static bool MountAccess(WeaponStation __instance,Unit owner,Unit target)=>BlackoutTargetAllowed(__instance,owner,target)&&(!(owner is Aircraft aircraft)||Datalink.CanLaunch(aircraft,target,__instance.WeaponInfo));
