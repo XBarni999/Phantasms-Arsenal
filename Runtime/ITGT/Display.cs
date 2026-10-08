@@ -33,7 +33,7 @@ namespace PhantasmsArsenal.ITGT
         int selected, nextID = 1;
         Vector2 center;
         float span = 40000;
-        GUIStyle label, small, button;
+        GUIStyle label, small, button, hudText;
         string message = "LMB: mark   RMB: pan   Wheel: zoom";
         Mark Active => marks.Count > 0 ? marks[Mathf.Clamp(selected, 0, marks.Count - 1)] : null;
         public static Aircraft Aircraft => SceneSingleton<CombatHUD>.i ? SceneSingleton<CombatHUD>.i.aircraft : null;
@@ -164,6 +164,8 @@ namespace PhantasmsArsenal.ITGT
                     button = new GUIStyle(label) { fontSize = 11, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
                     button.hover.textColor = Color.white;
                     button.active.textColor = new Color(.45f, 1f, .78f);
+                    hudText = new GUIStyle(GUI.skin.label) { fontSize = 13, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
+                    hudText.normal.textColor = Color.white;
                 }
                 GUI.backgroundColor = new Color(.18f, .21f, .19f);
                 if (!Aircraft || Aircraft.disabled) return;
@@ -373,6 +375,8 @@ namespace PhantasmsArsenal.ITGT
         }
         void DrawFlightCue()
         {
+            // Flight symbology yields to map, MFD, chat and menu layers.
+            if (visible || DynamicMap.mapMaximized || CursorManager.GetFlags() != CursorFlags.None) return;
             var aircraft = Aircraft;
             var station = aircraft.weaponManager?.currentWeaponStation;
             var mark = armed ? Assignment(Guidance.NextStore(station)) : Active;
@@ -387,7 +391,7 @@ namespace PhantasmsArsenal.ITGT
             float closing = Vector3.Dot(flatVelocity, horizontal.normalized);
             float angle = flatVelocity.sqrMagnitude > 1 ? Vector3.SignedAngle(flatVelocity, horizontal, Vector3.up) : 0;
             string status = armed ? "GPS TARGET" : "PREVIEW / GPS OFF";
-            Color color = new Color(.9f, .76f, .35f);
+            Color color = new Color(1f, .86f, .42f);
             string rangeText = "";
             var info = station?.WeaponInfo;
             if (armed && info && (info.bomb || info.glideBomb))
@@ -404,7 +408,7 @@ namespace PhantasmsArsenal.ITGT
                 if (height < 50) status = "CLIMB / TOO LOW";
                 else if (!aligned) status = angle < 0 ? "TURN LEFT" : "TURN RIGHT";
                 else if (distance > deliveryRange) status = "TOO FAR / HOLD";
-                else { status = "RELEASE WINDOW ~"; color = new Color(.4f, 1f, .65f); }
+                else { status = "RELEASE WINDOW ~"; color = new Color(.5f, 1f, .72f); }
                 rangeText = $"  /  EST RANGE {deliveryRange / 1000:0.0} km";
             }
             var projected = camera.WorldToScreenPoint(mark.point.ToLocalPosition());
@@ -421,18 +425,42 @@ namespace PhantasmsArsenal.ITGT
             }
             var matrix = GUI.matrix;
             GUIUtility.RotateAroundPivot(45, point);
+            Fill(new Rect(point.x - 11, point.y - 11, 22, 5), new Color(0, 0, 0, .85f));
+            Fill(new Rect(point.x - 11, point.y + 6, 22, 5), new Color(0, 0, 0, .85f));
+            Fill(new Rect(point.x - 11, point.y - 11, 5, 22), new Color(0, 0, 0, .85f));
+            Fill(new Rect(point.x + 6, point.y - 11, 5, 22), new Color(0, 0, 0, .85f));
             Fill(new Rect(point.x - 9, point.y - 9, 18, 2), color);
             Fill(new Rect(point.x - 9, point.y + 7, 18, 2), color);
             Fill(new Rect(point.x - 9, point.y - 9, 2, 18), color);
             Fill(new Rect(point.x + 7, point.y - 9, 2, 18), color);
             GUI.matrix = matrix;
-            var saved = GUI.color; GUI.color = color;
-            GUI.Label(new Rect(Mathf.Clamp(point.x - 85, 0, Screen.width - 170), point.y + 13, 170, 24), $"GPS T{mark.id:00}  {distance / 1000:0.0} km" + (onScreen ? "" : " / OFFSCREEN"), small);
+            Fill(new Rect(point.x - 1, point.y - 1, 2, 2), color);
+            if (onScreen)
+            {
+                Fill(new Rect(point.x, point.y + 15, 1, 7), color);
+                Fill(new Rect(point.x - 6, point.y + 22, 13, 1), color);
+            }
+            else
+            {
+                float bearing = Mathf.Atan2(point.y - Screen.height / 2f, point.x - Screen.width / 2f) * Mathf.Rad2Deg;
+                GUIUtility.RotateAroundPivot(bearing, point);
+                Fill(new Rect(point.x + 14, point.y - 1, 8, 2), color);
+                GUI.matrix = matrix;
+            }
+            HudLabel(new Rect(Mathf.Clamp(point.x - 110, 0, Screen.width - 220), point.y + 27, 220, 24), $"T{mark.id:00}  {distance / 1000:0.0} km" + (onScreen ? "" : "  >"), color);
             var panel = new Rect(Screen.width / 2f - 245, Screen.height * .32f, 490, 42);
-            GUI.color = color;
-            GUI.Label(new Rect(panel.x + 8, panel.y, panel.width - 16, 20), $"GPS T{mark.id:00}  /  {status}", small);
-            GUI.Label(new Rect(panel.x + 8, panel.y + 20, panel.width - 16, 20), $"{distance / 1000:0.0} km  /  HDG {(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg + 360) % 360:000}°{rangeText}", small);
-            GUI.color = saved;
+            HudLabel(new Rect(panel.x + 8, panel.y, panel.width - 16, 20), $"GPS T{mark.id:00}  /  {status}", color);
+            HudLabel(new Rect(panel.x + 8, panel.y + 20, panel.width - 16, 20), $"{distance / 1000:0.0} km  /  HDG {(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg + 360) % 360:000}°{rangeText}", color);
+        }
+        void HudLabel(Rect rect, string text, Color color)
+        {
+            var saved = GUI.color;
+            GUI.color = new Color(0, 0, 0, .9f);
+            GUI.Label(new Rect(rect.x - 1, rect.y, rect.width, rect.height), text, hudText);
+            GUI.Label(new Rect(rect.x + 1, rect.y, rect.width, rect.height), text, hudText);
+            GUI.Label(new Rect(rect.x, rect.y - 1, rect.width, rect.height), text, hudText);
+            GUI.Label(new Rect(rect.x, rect.y + 1, rect.width, rect.height), text, hudText);
+            GUI.color = color; GUI.Label(rect, text, hudText); GUI.color = saved;
         }
         void ClampCenter()
         {

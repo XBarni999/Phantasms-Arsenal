@@ -4,7 +4,7 @@ One DLL containing four editable Blueprinter weapon packs and an **I-TGT GPS tar
 
 ![Blackout missile rendered in Unity](docs/images/blackout.png)
 
-[Download the DLL](https://github.com/XBarni999/Phantasms-Arsenal/raw/refs/heads/main/dist/Phantasms-Arsenal.dll) · [Weapon gallery](docs/GALLERY.md) · [Editing guide](docs/EDITING.md)
+[Download the DLL](https://github.com/XBarni999/Phantasms-Arsenal/raw/refs/heads/main/dist/Phantasms-Arsenal.dll) · [GPS quick start](docs/ITGT-QUICKSTART.uk.md) · [GPS planning guide](docs/ITGT-GUIDE.uk.md) · [Weapon gallery](docs/GALLERY.md) · [Editing guide](docs/EDITING.md)
 
 | Pack | Weapons |
 | --- | --- |
@@ -65,7 +65,7 @@ Mouse-driven camera pan, tilt and zoom are blocked while the cursor is over the 
 
 Supported guidance: optical guided bombs, optical missiles, INS/optical cruise missiles, ballistic INS missiles, and laser-guided bombs with a coordinate midcourse. Optical terminal acquisition searches near the mark and requires line of sight and seeker field of view. Laser acquisition requires a genuinely illuminated target. If no target is acquired, the coordinate remains the aim point. Blackout activates around the coordinate using its existing HPM flight logic.
 
-The flight HUD marks the selected GPS point with a diamond, distance and bearing, including an edge marker when it is off screen. With GPS armed, it follows the next store's assignment. Small unboxed text above the main flight HUD provides an advisory bomb delivery cue: **TOO FAR / HOLD**, **TURN LEFT/RIGHT**, **CLIMB**, or **RELEASE WINDOW ~**. The estimate uses aircraft altitude/velocity and the native weapon range model; the green window is approximate, without terrain-path or wind prediction. There is no arbitrary minimum-distance rejection. It does not guarantee impact or bypass weapon safeties. Deleting all marks restarts numbering at T01.
+The flight HUD marks the selected GPS point with a diamond, central point, distance and bearing, including a direction marker when it is off screen. With GPS armed, it follows the next store's assignment. Bright outlined text above the main flight HUD provides an advisory bomb delivery cue without a background: **TOO FAR / HOLD**, **TURN LEFT/RIGHT**, **CLIMB**, or **RELEASE WINDOW ~**. This symbology hides when I-TGT, the map, chat or a cursor-driven menu is open, so it does not draw over interface panels. The estimate uses aircraft altitude/velocity and the native weapon range model; the green window is approximate, without terrain-path or wind prediction. There is no arbitrary minimum-distance rejection. It does not guarantee impact or bypass weapon safeties. Deleting all marks restarts numbering at T01.
 
 GPS-guided weapons with a native submunition dispenser require a real exposed enemy surface unit near the designated point before dispensing. GPS flight alone does not fabricate a target. The GPS adapter uses the native networked dispenser damage/deployment path after observing that unit, allowing the native submunition target selection to continue. Empty coordinates cannot satisfy this target requirement. Locust and Lawn Chair remain unguided CCIP mine dispensers.
 

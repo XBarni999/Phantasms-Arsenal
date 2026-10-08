@@ -28,6 +28,12 @@ The bomb test verifies the launch coordinate, not an accurate impact. It used an
 
 ## Manual acceptance checks
 
+### 1.1.4 test build
+
+Dedicated white-base HUD typography fixes the prior multiplication of cue colours by the MFD label colour. Thin text/symbol outlines improve contrast without a background. Flight symbology now yields when the MFD, maximized map or any native cursor/UI flag is active. Target markers gained centre and direction details.
+
+Build/dist/installed SHA-256: `438EDAC4D968AEF75BAC9FC2D7F15DE714563B0A4B3341D672C261C1D54E12E3`; compilation passed with zero errors/warnings, and installation occurred while the game was closed. The new contrast, UI suppression and marker presentation require live visual confirmation. The user reported satisfactory 1.1.3 operation and datalink import; that feedback does not establish the new visual changes. This build is intended as a GitHub prerelease.
+
 ### 1.1.3 follow-up
 
 The user reported a vanilla guided cluster bomb acquiring and hitting a real target during their test. This is user-observed flight feedback; no separate automatic casing/submunition deployment trace was captured.

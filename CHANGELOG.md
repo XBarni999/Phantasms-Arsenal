@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.4 — 2026-10-08 — test build
+
+- Gave GPS flight symbology a separate bright text style with a thin dark outline, fixing its dim colour multiplication without adding a background panel.
+- Hide flight cues and target markers while I-TGT, the map, chat or a cursor-driven menu is open, preventing overlay on those interface layers.
+- Refined the world target diamond with an outlined frame, centre point, range label and off-screen direction indication.
+- Added separate Ukrainian quick-start and detailed planning guides covering settings, datalink import, assignments, release order, HUD cues, cluster requirements and troubleshooting.
+- Published as a prerelease for mission testing; delivery estimates and broad weapon compatibility remain subject to flight validation.
+
 ## 1.1.3 — 2026-10-08
 
 - Added DL→GPS to copy a selected datalink target's known HQ coordinate into a new GPS mark.
