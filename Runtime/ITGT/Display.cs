@@ -16,7 +16,8 @@ namespace PhantasmsArsenal.ITGT
         readonly Dictionary<string, Mark> assignments = new Dictionary<string, Mark>();
         readonly Dictionary<Hardpoint, Mark> pylonAssignments = new Dictionary<Hardpoint, Mark>();
         readonly Dictionary<MountedMissile, Mark> storeAssignments = new Dictionary<MountedMissile, Mark>();
-        enum BindingScope { Type, Pylon, Store }
+        readonly DesignationCycle<Mark> cycle = new DesignationCycle<Mark>();
+        enum BindingScope { Cycle, Type, Pylon, Store }
         BindingScope bindingScope;
         int selectedStore;
         readonly TopographicMap topography = new TopographicMap();
@@ -49,7 +50,19 @@ namespace PhantasmsArsenal.ITGT
         internal static void Trace(string value) => Log.LogInfo(value);
         internal static bool GpsArmedFor(Unit owner, WeaponInfo info) => instance && instance.armed && owner == Aircraft && owner && owner.IsServer && Guidance.Supports(info);
         internal static void UnassignedNotice() { if (instance) instance.message = "Next store has no mark: BIND it or disarm GPS"; }
-        internal static void ConsumeStore(MountedMissile mount) { if (instance) instance.storeAssignments.Remove(mount); }
+        internal static Mark CaptureMark(MountedMissile mount, out bool automatic)
+        {
+            automatic = instance && mount && !instance.storeAssignments.ContainsKey(mount) &&
+                (Guidance.Pylon(mount) == null || !instance.pylonAssignments.ContainsKey(Guidance.Pylon(mount))) &&
+                !instance.assignments.ContainsKey(mount.info.name);
+            return instance ? instance.Assignment(mount) : null;
+        }
+        internal static void ReleaseCommitted(MountedMissile mount, Mark captured, bool automatic)
+        {
+            if (!instance || !mount) return;
+            if (automatic) instance.cycle.Advance(mount.info.name, instance.marks, captured);
+            instance.storeAssignments.Remove(mount);
+        }
         internal static bool TryDesignation(Unit owner, WeaponInfo info, out GlobalPosition point)
         {
             var aircraft = owner as Aircraft;
@@ -74,7 +87,8 @@ namespace PhantasmsArsenal.ITGT
             if (storeAssignments.TryGetValue(mount, out var mark)) return mark;
             var pylon = Guidance.Pylon(mount);
             if (pylon != null && pylonAssignments.TryGetValue(pylon, out mark)) return mark;
-            return mount.info && assignments.TryGetValue(mount.info.name, out mark) ? mark : null;
+            if (!mount.info || !Guidance.Supports(mount.info)) return null;
+            return assignments.TryGetValue(mount.info.name, out mark) ? mark : cycle.Current(mount.info.name, marks);
         }
 
         void Awake()
@@ -121,7 +135,7 @@ namespace PhantasmsArsenal.ITGT
             var aircraft = Aircraft;
             if (aircraft != lastAircraft || missionOrigin != Datum.origin)
             {
-                SetVisible(false); armed = false; marks.Clear(); assignments.Clear(); pylonAssignments.Clear(); storeAssignments.Clear(); selected = 0; selectedStore = 0; nextID = 1;
+                SetVisible(false); armed = false; marks.Clear(); assignments.Clear(); pylonAssignments.Clear(); storeAssignments.Clear(); cycle.Clear(); selected = 0; selectedStore = 0; nextID = 1;
                 Guidance.Clear(); lastAircraft = aircraft;
                 topography.Dispose(); missionOrigin = Datum.origin;
                 if (aircraft)
@@ -216,7 +230,7 @@ namespace PhantasmsArsenal.ITGT
             var assigned = Assignment(nextMount);
             string assignment = assigned != null ? "T" + assigned.id.ToString("00") : "NONE";
             GUI.Label(new Rect(58, 49, w - 116, 24), weapon + "  /  NEXT GPS " + assignment, small);
-            string scope = bindingScope == BindingScope.Type ? "TYPE" : bindingScope == BindingScope.Pylon ? "PYLON" : "STORE";
+            string scope = bindingScope == BindingScope.Cycle ? "CYCLE" : bindingScope == BindingScope.Type ? "TYPE" : bindingScope == BindingScope.Pylon ? "PYLON" : "STORE";
             string slot = selectedMount ? StoreLabel(selectedMount, station) : "NO STORE";
             GUI.Label(new Rect(58, 74, w - 116, 22), (armed ? "GPS ON" : "GPS OFF") + "  /  BIND: " + scope + "  /  " + slot, small);
             if (Button(new Rect(14, 112, 43, 34), "+")) Zoom(.7f);
@@ -224,7 +238,7 @@ namespace PhantasmsArsenal.ITGT
             if (Button(new Rect(14, 208, 43, 34), "OWN")) { var p = Aircraft.GlobalPosition(); center = new Vector2(p.x, p.z); }
             if (Button(new Rect(14, 256, 43, 34), "TGT") && Active != null) center = new Vector2(Active.point.x, Active.point.z);
             if (Button(new Rect(14, 304, 43, 34), "TOPO")) replaceMap.Value = !replaceMap.Value;
-            if (Button(new Rect(14, 352, 43, 34), "SCOPE")) bindingScope = (BindingScope)(((int)bindingScope + 1) % 3);
+            if (Button(new Rect(14, 352, 43, 34), "SCOPE")) bindingScope = (BindingScope)(((int)bindingScope + 1) % 4);
             if (Button(new Rect(14, 400, 43, 34), "DL→GPS")) ImportDatalink();
             if (Button(new Rect(w - 57, 352, 43, 34), "SLOT") && stores.Count > 0) selectedStore = (selectedStore + 1) % stores.Count;
             if (Button(new Rect(w - 57, 112, 43, 34), "PREV") && marks.Count > 0) selected = (selected + marks.Count - 1) % marks.Count;
@@ -235,7 +249,7 @@ namespace PhantasmsArsenal.ITGT
             {
                 if (armed) armed = false;
                 else if (!Aircraft.IsServer) message = "GPS release: single player / host only";
-                else if (compatible && Active != null) { Bind(info, selectedMount); armed = true; }
+                else if (compatible && Active != null) { if (bindingScope != BindingScope.Cycle) Bind(info, selectedMount); else assignments.Remove(info.name); armed = true; }
                 else message = "Select a compatible weapon and create a mark";
             }
             DrawMap();
@@ -247,7 +261,7 @@ namespace PhantasmsArsenal.ITGT
             if (Button(new Rect(w / 2 - 90, h - 42, 180, 28), armed ? "GPS ON  •  DISARM" : "GPS OFF  •  ARM"))
             {
                 if (armed) armed = false;
-                else if (Aircraft.IsServer && compatible && Active != null) { Bind(info, selectedMount); armed = true; }
+                else if (Aircraft.IsServer && compatible && Active != null) { if (bindingScope != BindingScope.Cycle) Bind(info, selectedMount); else assignments.Remove(info.name); armed = true; }
                 else message = "Select a compatible weapon and create a mark (host)";
             }
             Resize(new Rect(w - 30, h - 30, 24, 24));
@@ -269,6 +283,7 @@ namespace PhantasmsArsenal.ITGT
         void Bind(WeaponInfo info, MountedMissile mount)
         {
             if (!Guidance.Supports(info) || Active == null) { message = "Cannot bind: compatible weapon and mark required"; return; }
+            if (bindingScope == BindingScope.Cycle) { assignments.Remove(info.name); cycle.Reset(info.name); message = "CYCLE: T01 onward, wraps after last mark"; return; }
             if (bindingScope == BindingScope.Type) assignments[info.name] = Active;
             else if (bindingScope == BindingScope.Pylon)
             {
@@ -287,11 +302,12 @@ namespace PhantasmsArsenal.ITGT
         {
             if (Active == null) return;
             var removed = Active;
+            cycle.Remove(removed, marks);
             foreach (var key in new List<string>(assignments.Keys)) if (assignments[key] == removed) assignments.Remove(key);
             foreach (var key in new List<Hardpoint>(pylonAssignments.Keys)) if (pylonAssignments[key] == removed) pylonAssignments.Remove(key);
             foreach (var key in new List<MountedMissile>(storeAssignments.Keys)) if (storeAssignments[key] == removed) storeAssignments.Remove(key);
             marks.Remove(removed); selected = Mathf.Clamp(selected, 0, Mathf.Max(0, marks.Count - 1));
-            if (marks.Count == 0) { armed = false; nextID = 1; selected = 0; message = "All marks cleared: next mark is T01"; }
+            if (marks.Count == 0) { armed = false; cycle.Clear(); nextID = 1; selected = 0; message = "All marks cleared: next mark is T01"; }
         }
         void ImportDatalink()
         {
@@ -381,6 +397,7 @@ namespace PhantasmsArsenal.ITGT
             var station = aircraft.weaponManager?.currentWeaponStation;
             var mark = armed ? Assignment(Guidance.NextStore(station)) : Active;
             var cameraManager = SceneSingleton<CameraStateManager>.i;
+            if (!cameraManager || CameraStateManager.cameraMode != CameraMode.cockpit || cameraManager.currentState != cameraManager.cockpitState) return;
             var camera = cameraManager ? cameraManager.mainCamera : null;
             if (mark == null || !camera || !aircraft.rb) return;
             var delta = mark.point - aircraft.GlobalPosition();

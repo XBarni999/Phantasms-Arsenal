@@ -22,12 +22,14 @@ Coordinates are mission east/north positions in kilometres and elevation in metr
 
 1. Select a weapon using normal controls or **WPN**.
 2. Choose a mark with **PREV / NEXT**.
-3. Use **SCOPE**: **TYPE** programs the selected weapon type, **PYLON** one pylon, and **STORE** one mounted bomb/missile.
+3. Use **SCOPE**: **CYCLE** (default) cycles through all marks, **TYPE** fixes the selected weapon type to one mark, **PYLON** fixes one pylon, and **STORE** fixes one mounted bomb/missile.
 4. For PYLON or STORE, use **SLOT** to choose the mounted store. The header shows its pylon and store number.
 5. Press **BIND**. Repeat for other marks or stores.
-6. Press **ARM / GPS**. This also binds the active mark at the current scope, so check the selection first.
+6. Press **ARM / GPS**. In TYPE/PYLON/STORE this also binds the active mark, so check the selection first. In CYCLE it enables automatic sequencing and removes a fixed TYPE assignment without resetting the current queue. BIND in CYCLE explicitly resets to the first mark.
 
-STORE overrides PYLON; PYLON overrides TYPE. **NEXT GPS Txx** shows the next store's assignment in native release order. SLOT selects a store for programming; it does not change that order. An unassigned compatible next store is held while GPS is armed. Bind it or press **DISARM**.
+STORE overrides PYLON; PYLON overrides fixed TYPE; otherwise CYCLE supplies the next mark. **NEXT GPS Txx** shows the next store's assignment in native release order. SLOT selects a store for programming; it does not change release order.
+
+CYCLE follows mark creation order and wraps after the final mark. Ten weapons and six marks produce T01, T02, T03, T04, T05, T06, T01, T02, T03, T04. Each weapon type has its own queue. Reading a preview or attempting a blocked/failed release does not consume a mark: advancement happens only when the missile/bomb is actually spawned. Explicit STORE/PYLON/TYPE releases do not consume the automatic queue. Disarming and rearming CYCLE preserves its position; BIND resets it. Deleted marks are skipped, and clearing the plan resets the queues.
 
 ## Approaching and releasing
 
@@ -69,7 +71,8 @@ Suppose three stationary targets require different stores of the same guided wea
 | STORE, PYLON and TYPE | STORE |
 | PYLON and TYPE | PYLON |
 | TYPE only | TYPE |
-| None, GPS armed | Compatible store release held |
+| No explicit assignment, marks exist | Next CYCLE mark |
+| No marks | No GPS designation |
 
 STORE assignments are consumed at release and do not transfer automatically to replacement stores after rearming. TYPE/PYLON persist within the aircraft/mission. Deleting a mark removes its assignments; changing aircraft or missions clears the plan. Saving plans to files is not implemented.
 
@@ -81,18 +84,18 @@ STORE assignments are consumed at release and do not transfer automatically to r
 | + / − | GPS map zoom |
 | OWN / TGT | Centre on aircraft / selected mark |
 | TOPO | Native topographic background ON/OFF |
-| SCOPE | TYPE → PYLON → STORE |
+| SCOPE | CYCLE → TYPE → PYLON → STORE |
 | SLOT | Next available store for programming |
 | DL→GPS | New mark from the first selected Data Link target |
 | PREV / NEXT | Previous / next GPS mark |
 | DEL | Delete selected mark and its assignments |
 | BIND | Save assignment at the selected scope |
-| GPS or ARM / DISARM | Enable GPS with BIND / disable GPS |
+| GPS or ARM / DISARM | Enable GPS (fixed scopes also bind) / disable GPS |
 | X or opening key | Close MFD without disarming GPS |
 
 ## HUD layers
 
-The bright outlined diamond and centre point mark the coordinate in the world. Off-screen points appear at the edge with a direction indication. The label shows mark number and distance. Amber is used for preview/advisory cues; green indicates the approximate delivery window.
+The target marker and delivery text are **cockpit-only** and are hidden in external, chase and other camera views. The bright outlined diamond and centre point mark the coordinate in the world. Off-screen points appear at the edge with a direction indication. The label shows mark number and distance. Amber is used for preview/advisory cues; green indicates the approximate delivery window.
 
 With GPS off, the HUD shows the selected mark as PREVIEW. With GPS armed, it shows the next store's assignment. If missing, it does not substitute the selected preview: check NEXT GPS and BIND.
 

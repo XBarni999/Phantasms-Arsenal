@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Phantasms-Arsenal</AssemblyName>
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <LangVersion>latest</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GameDir Condition="'$(GameDir)' == ''">F:\Games\Nuclear.Option.v0.34.1</GameDir>
@@ -105,6 +105,7 @@
     <Compile Include="ITGT\Display.cs" />
     <Compile Include="ITGT\TopographicMap.cs" />
     <Compile Include="ITGT\Guidance.cs" />
+    <Compile Include="ITGT\DesignationCycle.cs" />
     <Compile Include="ITGT\WeaponInventory.cs" />
   </ItemGroup>
   <ItemGroup>

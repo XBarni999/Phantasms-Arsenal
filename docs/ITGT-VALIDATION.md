@@ -30,6 +30,12 @@ The bomb test verifies the launch coordinate, not an accurate impact. It used an
 
 ## Manual acceptance checks
 
+### 1.1.5 follow-up
+
+Cockpit symbology now requires both the native cockpit camera mode and active cockpit state. CYCLE is the default assignment scope; explicit STORE/PYLON/TYPE assignments retain priority. The cursor advances after a matched non-null spawned weapon, not during selection or mounted-release capture. Pending captures for the same rail are replaced to prevent stale failed attempts from matching a subsequent release.
+
+`verification/Verify-ITGTCycle.ps1` passed against the production queue helper: ten commits with six marks produce 1–2–3–4–5–6–1–2–3–4. It also checks type isolation, repeated previews, stale commits, deleted next marks, wrapping, reset and empty/new plans. Compilation passed with zero errors/warnings; build/dist/installed SHA-256 is `ECFCE75C40B8A156B2B4DFDBD273EDCF610F9744F65824BC3ECBACAC62281232`. Installation occurred while the game was closed. Camera transitions and actual ten-weapon mission sequencing still need live confirmation; helper tests do not establish the entire release integration.
+
 ### 1.1.4 test build
 
 Dedicated white-base HUD typography fixes the prior multiplication of cue colours by the MFD label colour. Thin text/symbol outlines improve contrast without a background. Flight symbology now yields when the MFD, maximized map or any native cursor/UI flag is active. Target markers gained centre and direction details.

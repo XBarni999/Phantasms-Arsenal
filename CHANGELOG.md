@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.5 — 2026-10-08
+
+- Restricted GPS target markers and delivery cues to the cockpit camera.
+- Added default CYCLE sequencing through all marks in creation order, wrapping after the final mark. Each weapon type has an independent queue, with explicit store/pylon/type assignments taking priority.
+- Advance the queue and consume individual assignments only after an actual spawned release. Failed/blocked release attempts and HUD previews do not advance it. CYCLE BIND resets the queue; arming preserves its position.
+- Skip deleted queue entries and reset queues on aircraft/mission changes or a cleared plan.
+
 ## Documentation update — 2026-10-08
 
 - Translated GPS quick-start, planning and compatibility documentation into English and refreshed the test-release package.

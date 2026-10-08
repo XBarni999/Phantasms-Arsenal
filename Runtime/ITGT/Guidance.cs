@@ -13,6 +13,8 @@ namespace PhantasmsArsenal.ITGT
             public MountedMissile mount;
             public Unit owner;
             public GlobalPosition point;
+            public Display.Mark mark;
+            public bool automatic;
         }
         static readonly List<Release> pending = new List<Release>();
         static Release spawning;
@@ -106,9 +108,9 @@ namespace PhantasmsArsenal.ITGT
             if (!owner || !owner.IsServer || (bool)Fired.GetValue(__instance) || !__instance.IsAttached() || !Supports(__instance.info)) return;
             if (!Display.TryDesignation(owner, __instance, out var point)) return;
             target = null; aimpoint = point;
-            pending.RemoveAll(p => !p.mount || !p.owner || p.owner.disabled);
-            pending.Add(new Release { mount = __instance, owner = owner, point = point });
-            Display.ConsumeStore(__instance);
+            pending.RemoveAll(p => !p.mount || !p.owner || p.owner.disabled || p.mount == __instance);
+            var mark = Display.CaptureMark(__instance, out var automatic);
+            pending.Add(new Release { mount = __instance, owner = owner, point = point, mark = mark, automatic = automatic });
         }
 
         static void Spawn(GameObject missile, Vector3 launchPosition, Unit owner, ref Unit target, out Release __state)
@@ -126,8 +128,9 @@ namespace PhantasmsArsenal.ITGT
         static void SpawnBound(Missile __result)
         {
             // Some network spawning paths defer LocalStart. Carry the designation on the spawned object too.
-            if (spawning == null || !__result || __result.GetComponent<CoordinateFlight>()) return;
-            __result.gameObject.AddComponent<CoordinateFlight>().Bind(__result, __result.GetComponent<MissileSeeker>(), spawning.point);
+            if (spawning == null || !__result) return;
+            Display.ReleaseCommitted(spawning.mount, spawning.mark, spawning.automatic);
+            if (!__result.GetComponent<CoordinateFlight>()) __result.gameObject.AddComponent<CoordinateFlight>().Bind(__result, __result.GetComponent<MissileSeeker>(), spawning.point);
         }
 
         static void Initialize(MissileSeeker __instance, ref Unit target, ref GlobalPosition aimpoint)
