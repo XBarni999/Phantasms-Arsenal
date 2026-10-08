@@ -6,3 +6,5 @@ verification/*.result
 *.user
 GitHub-Api.py
 verification/*.nobp
+verification/materials-*.txt
+verification/*.log

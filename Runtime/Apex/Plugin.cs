@@ -121,6 +121,3 @@ namespace Apex6AmmoVisuals
         }
     }
 }
-
-
-

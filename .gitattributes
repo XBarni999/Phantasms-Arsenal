@@ -1,0 +1,11 @@
+* text=auto
+*.png binary
+*.fbx binary
+*.dll binary
+*.nobp binary
+# Unity writes empty YAML values with a trailing space.
+*.meta whitespace=-blank-at-eol
+*.asset whitespace=-blank-at-eol
+*.prefab whitespace=-blank-at-eol
+*.mat whitespace=-blank-at-eol
+*.anim whitespace=-blank-at-eol

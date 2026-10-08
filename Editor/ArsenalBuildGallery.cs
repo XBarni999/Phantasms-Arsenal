@@ -106,6 +106,3 @@ public static class ArsenalBuildGallery
         } finally { preview.Cleanup(); }
     }
 }
-
-
-
