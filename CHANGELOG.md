@@ -7,7 +7,7 @@
 - Suppressed camera pan/tilt/zoom commands while the pointer is over I-TGT or resizing it, preserving flight input.
 - Replaced the own-aircraft cross with a silhouette and contrasting nose tip.
 - Keep the generated native map layer opaque when the game reapplies its theme tint.
-- Added a Ukrainian usage guide and cleaned the installed weapon compatibility table of UFO/event placeholders and external fuel tanks.
+- Added a Ukrainian usage guide and a bomb/missile compatibility table, excluding UFO placeholders, external fuel tanks, guns, laser installations and non-weapon equipment.
 
 ## 1.1.2 — 2026-10-08
 

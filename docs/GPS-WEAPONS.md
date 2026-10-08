@@ -1,81 +1,14 @@
 # GPS — сумісність установленої зброї
 
-Знімок поточної установки Nuclear Option від 2026-10-08 після завантаження Blueprinter. Нижче наведено зброю та лазерні системи; UFO-записи, зовнішні паливні баки, вантажі, радарні/службові контейнери, транспорт і засоби протидії вилучено. Внутрішні боєприпаси залишено окремими рядками. Однакові назви з різними asset ID — різні визначення.
+Знімок поточної установки Nuclear Option від 2026-10-08 після завантаження Blueprinter. Тут наведено бомби, ракети та касетні/внутрішні боєприпаси. Гармати й лазерні установки вилучено як такі, для яких ця система GPS не призначена. UFO-записи, зовнішні паливні баки, вантажі, радарні/службові контейнери, транспорт і засоби протидії також вилучено. Однакові назви з різними asset ID — різні визначення.
 
 «Так» означає сумісність поточного GPS-адаптера з компонентами префаба, а не підтверджений польотний тест кожного типу. GPS-запуск доступний у single player або хосту. Лазерним бомбам потрібне підсвічування для лазерного кінцевого наведення; керованим касетам — реальна видима ворожа ціль біля мітки для розкриття.
 
 | Зброя | Asset ID | GPS | Компонент / умова |
 | --- | --- | --- | --- |
-| 105mm Cannon | Aryx_ADLT_Gun105mmTank | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 105mm Howitzer | Aryx_MC260_Chimera_Howitzer_WI | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 12.7mm Machine Gun | Gun12.7mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 12.7mm Rotary Machine Gun | Gun12.7mm_Rotary | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 120kw Laser | Laser_EW1 | Ні | Немає підтримуваного керованого наведення |
-| 120mm Cannon | 1509_GunNaval120 | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 127mm Cannon | 1509_GunNaval127 | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 127mm Cannon | Gun127mm_Guided_Naval | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 127mm Railgun | Aryx_MC260_Chimera_Railgun_WI | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 130mm Cannon | Gun130mm_Tank | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 130mm Railgun | Aryx_Railgun_130 | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 14.5mm Machine Gun | Aryx_PropAttacker1_14.5mm_info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 152mm Cannon | Aryx_FRCV_Artillery_152_Guided_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 155mm Cannon | Gun155mm_Guided | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 155mm Railgun | Railgun1 | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 2000kg HE Warhead | Aryx_USV1_Warhead_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 200kW Blue Laser | Aryx_Supercarrier1_Laser_200kwBlue | Ні | Немає підтримуваного керованого наведення |
-| 203mm Deck Gun | Aryx_NavalGun_203mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20kw Laser | Laser_APS1 | Ні | Немає підтримуваного керованого наведення |
-| 20mm Autocannon | Aryx_LightFighter1_20mm_AC_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Autocannon | Aryx_PropAttacker1_20mm_AC | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Autocannon | Gun20mm_Pod | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm M61 Vulcan Cannon | aryx_f16m_gun_20mm_internal_500_info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon | Gun20mm_CIWS | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon | Gun20mm_Rotary | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon | Gun20mm_Rotary_Turret | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon | info_BVR_turret_20mm_rotary | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon | P_Trisurface1_Gun20mm_info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon (Hi-RPM) | Aryx_Interceptor1_Gun_20mm_1000rd_Internal_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 20mm Rotary Cannon (LO-RPM) | Aryx_Interceptor1_Gun_20mm_1000rd_Internal_LowRPM_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 23mm Autocannon | Gun23mm_Autocannon | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 23mm CIWS | Aryx_MissileFrigate_S_23mmCIWS | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 25mm Autocannon | 1509_Internal 25mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 25mm Autocannon | Gun25mm_Autocannon | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 25mm Rotary Cannon | Gun25mm_Rotary | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 27mm Autocannon | Gun27mm_Autocannon | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | 1509_Gun30mm_Aerial | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | Aryx_Gunboat1_30mmAC | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | Aryx_LightHeli1_30mmTurret_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | Aryx_PropAttacker1_30mmGunpod_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | Aryx_Supercarrier1_30mmAutocannon | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Autocannon | Aryx_SwivelGunpod30_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Cannon | Gun30mm_SPAAG | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Chaingun | Gun30mm_Chaingun_Turret | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Rotary Cannon | Aryx_MC260_Chimera_Rotary_Turret_WI | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Rotary Cannon | Gun30mm_Rotary | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 30mm Rotary Cannon | Gun30mm_Rotary_Turret | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 35mm AA Autocannon | Aryx_MC260_35mmGun | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 35mm Autocannon | Gun35mm_Autocannon | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
 | 3M22 Zircon | zircon info | Так | OpticalSeeker |
 | 3N22 Zircon 250kt | zircon nuke info | Так | OpticalSeeker |
 | 3S-RMM | 1509_AAM1Gelb_info | Ні | IRSeeker; адаптер не підтримує це визначення |
-| 406mm Cannon | 1509_Gun_406mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 406mm Cannon | 1509_Gun_406mm_N | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 40mm Cannon | Gun40mm_Naval | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 40mm GMG | Grenade_40mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 40mm Grenade | Grenade_40mm_short | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | Gun57mm_Aerial | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | Gun57mm_Naval | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | Gun57mm_Pod | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | Gun57mm_SPAAG | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | info_BVR_turret_57mm_BellyMount | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Cannon | info_BVR_turret_57mm_SideMount | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 57mm Chaingun | Aryx_MC260_Chimera_Autocannon_Turret_WI | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 5MW Laser | Trisurface1_laser_info | Ні | Немає підтримуваного керованого наведення |
-| 70mm Light AT | Gun70mm_RCL | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 76mm Cannon | Gun76mm_Guided | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 76mm Cannon | Gun76mm_Guided_Naval | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
-| 80kw Laser | Laser_APS2 | Ні | Немає підтримуваного керованого наведення |
-| 81mm Mortar | Aryx_Mortar_81mm_Info | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
 | AAM-120C | MeridianAMRAAM_WeaponInfo | Ні | ARHSeeker; адаптер не підтримує це визначення |
 | AAM-29 Scythe | AAM2_info | Ні | ARHSeeker; адаптер не підтримує це визначення |
 | AAM-36 Scimitar | AAM4_info | Ні | ARHSeeker; адаптер не підтримує це визначення |
@@ -171,7 +104,6 @@
 | IRM-S2 | AAM3_info | Ні | IRSeeker; адаптер не підтримує це визначення |
 | IRM-S5 Gladius | Aryx_SRIRM1_info | Ні | IRSeeker; адаптер не підтримує це визначення |
 | K-30M | k30 info | Ні | IRSeeker; адаптер не підтримує це визначення |
-| Light Machine Gun | Gun7.5mm | Ні | Гармата / кулемет; GPS-адаптер не застосовується |
 | Locust Mine | WI_LocustMine | Ні | Немає підтримуваного керованого наведення |
 | MBDA Brimstone | Brimstone Info | Так | OpticalSeeker |
 | MBDA METEOR | METEOR info | Ні | ARHSeeker; адаптер не підтримує це визначення |
