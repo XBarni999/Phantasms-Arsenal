@@ -3,8 +3,9 @@
 Unity renders of the combined pack's actual editable prefabs, at 2400 × 1350 pixels.
 
 ## R-460 Poseidon
-![Poseidon conventional](images/poseidon.png)
-![Poseidon nuclear](images/poseidon-nuclear.png)
+The conventional and nuclear aircraft variants share the same exterior, shown once below.
+
+![Poseidon aircraft variants](images/poseidon.png)
 ![Poseidon TEL missile](images/poseidon-tel.png)
 
 ## HSM-290 Killjoy
