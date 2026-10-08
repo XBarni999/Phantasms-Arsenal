@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 $ErrorActionPreference = 'Stop'
 $taskSource = [IO.File]::ReadAllText((Join-Path $PSScriptRoot '../Runtime/ITGT/DesignationCycle.cs'))
 $taskChecks = @'
