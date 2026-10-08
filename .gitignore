@@ -8,3 +8,4 @@ GitHub-Api.py
 verification/*.nobp
 verification/materials-*.txt
 verification/*.log
+verification/itgt-api/

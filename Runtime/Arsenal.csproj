@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Phantasms-Arsenal</AssemblyName>
-    <Version>1.0.3</Version>
+    <Version>1.1.0</Version>
     <LangVersion>latest</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GameDir Condition="'$(GameDir)' == ''">F:\Games\Nuclear.Option.v0.34.1</GameDir>
@@ -66,6 +66,10 @@
       <HintPath>$(Managed)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(Managed)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>$(Managed)\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
@@ -94,6 +98,9 @@
     <Compile Include="Apex\Pallet.cs" />
     <Compile Include="Poseidon\PoseidonTELRuntime.cs" />
     <Compile Include="ArsenalPlugin.cs" />
+    <Compile Include="ITGT\Display.cs" />
+    <Compile Include="ITGT\TopographicMap.cs" />
+    <Compile Include="ITGT\Guidance.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Bundles\Phantasm's Arsenal_1.0.0.nobp" LogicalName="Arsenal.Weapons.nobp" />

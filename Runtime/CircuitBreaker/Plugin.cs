@@ -116,6 +116,7 @@ namespace CircuitBreaker
         static bool TurretStep(Turret __instance){if(!(Suppression.Active(__instance)||Suppression.ActiveUnit(__instance.GetAttachedUnit()))||(__instance.GetWeaponStation()?.WeaponInfo?.gun??false))return true;AccessTools.Field(typeof(Turret),"target").SetValue(__instance,null);AccessTools.Field(typeof(Turret),"timeOnTarget").SetValue(__instance,0f);return false;}
         static bool BlackoutTargetAllowed(WeaponStation station,Unit owner,Unit target){
             if(!station.WeaponInfo||station.WeaponInfo.name!="WI_Blackout")return true;
+            if(PhantasmsArsenal.ITGT.Display.TryDesignation(owner,station,out _))return true;
             if(target&&Suppression.IsActivator(target)&&target.NetworkHQ&&target.NetworkHQ!=owner.NetworkHQ)return true;
             if(owner==Datalink.LocalAircraft&&Time.time>=nextTargetNotice){nextTargetNotice=Time.time+3;var report=SceneSingleton<AircraftActionsReport>.i;if(report)report.ReportText("Blackout: select an enemy ground radar / SAM.",3);}
             return false;

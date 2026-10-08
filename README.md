@@ -1,6 +1,6 @@
 # Phantasm's Arsenal
 
-One DLL containing four editable Blueprinter weapon packs for **Nuclear Option**.
+One DLL containing four editable Blueprinter weapon packs and an **I-TGT GPS targeting system** for **Nuclear Option**.
 
 ![Blackout missile rendered in Unity](docs/images/blackout.png)
 
@@ -33,7 +33,7 @@ Cargo pallets carry eight Apex-6 or four Apex-8 drones. After a ramp drop, they 
 
 ### AGM-180 Blackout — temporarily suppress air defenses
 
-Blackout carries a high-power microwave emitter. Select an **enemy ground radar or SAM** before firing: targetless launches and ordinary tank targets are rejected. The missile remembers its original target even if you change selection after launch.
+Blackout carries a high-power microwave emitter. In native targeting mode, select an **enemy ground radar or SAM** before firing: targetless launches and ordinary tank targets are rejected. Alternatively, assign an I-TGT GPS mark and arm GPS to launch toward that coordinate. The missile remembers its original target or coordinate even if you change selection after launch.
 
 At the default settings, emission starts within 10 km of that target and lasts 20 seconds, affecting exposed receivers within 10 km of the moving missile. Terrain blocks exposure. It suppresses enemy ground electronics, radar, laser defenses and missile-defense targeting. It is intended to open a temporary attack window, rather than destroy a site with a large explosion; its impact charge is only 2 kg HE.
 
@@ -48,6 +48,23 @@ Locust is an unguided 400 kg dispenser delivered using CCIP. It deploys conventi
 Lawn Chair uses a similar dispenser body but carries eight Zhdan sensor mines. Unlike Locust contact mines, Zhdan waits for an enemy ground vehicle within 70 m and requires clear line of sight. It arms four seconds after landing; terrain, bridges and obstacles can prevent detection or attack.
 
 When a target is available, the mine checks its attack corridor, reserves the target, hops upward and hands off to a vanilla GS25 at an 80 m apex. Each mine gets one shot, and nearby mines coordinate target reservations. Unused mines expire after 300 seconds. Choose Lawn Chair to set a vehicle ambush, and Locust to lay a contact minefield. Zhdan is not a separate aircraft loadout item. Its hop, handoff and multiplayer behavior still require further mission testing.
+
+## I-TGT GPS screen
+
+![I-TGT with a GPO-500 GPS assignment in a live mission](docs/images/itgt.png)
+
+During flight, press **F6** or click **I-TGT**. The MFD has a light topographic map in a dark bezel, 100 m contours, shaded relief, a north-up grid and an own-aircraft symbol. Terrain is sampled gradually after entering a mission; the map displays the generation progress.
+
+1. Click the map to create a mark (up to 16). Coordinates are mission east/north positions in kilometres, with terrain elevation in metres; these are not real-world latitude/longitude.
+2. Select a compatible aircraft weapon using the normal game controls or **WPN**. Choose a mark with **PREV/NEXT**, then choose the assignment scope with **SCOPE**: **TYPE** assigns the weapon type, **PYLON** assigns a pylon, and **STORE** assigns one mounted bomb or missile. **SLOT** cycles the available stores; the display identifies their pylon and store number. Press **BIND** to save the assignment. Different pylons and individual stores can use different marks.
+3. Press **ARM** or **GPS**. This also binds the selected mark at the selected scope. Normal releases follow the game's existing store order: an individual store assignment takes priority over its pylon, then its weapon type. The next release's GPS mark is displayed. An unassigned compatible store is held while GPS is armed. Each released weapon retains its coordinate when you change selection later; individual store assignments are consumed at release. GPS uses single-store releases; native object-target salvos resume after disarming.
+4. Use the mouse wheel or **+/−** to zoom, right-drag to pan, **OWN/TGT** to recenter, and **DEL** to remove the selected mark. Drag the bezel's header to move the screen or its lower-right corner to resize it. F6 closes it without disarming GPS. Close the screen before firing; native menu and landing-gear weapon safeties still apply.
+
+Supported guidance: optical guided bombs, optical missiles, INS/optical cruise missiles, ballistic INS missiles, and laser-guided bombs with a coordinate midcourse. Optical terminal acquisition searches near the mark and requires line of sight and seeker field of view. Laser acquisition requires a genuinely illuminated target. If no target is acquired, the coordinate remains the aim point. Blackout activates around the coordinate using its existing HPM flight logic.
+
+Unguided bombs/dispensers, high-drag submunitions, radar/IR lock weapons and laser-only missiles cannot be assigned. GPS release currently requires **single player or the multiplayer host**; remote clients retain native targeting. Marks and assignments reset when changing aircraft or entering another mission. The flight UI reports unsupported selections.
+
+The native game map uses the generated topographic background by default. **TOPO** toggles that replacement while the I-TGT screen keeps its own topographic map. The BepInEx `I-TGT` section controls the toggle key, native background replacement and default window size. This is generated from the active mission's terrain, with faint native image detail, terrain colours, hill shading and contours. Entering another mission rebuilds the map; changes to terrain during the same mission are not tracked continuously. Live visual/launch validation is recorded separately from compilation.
 
 ## Installation
 
@@ -70,3 +87,5 @@ The DLL preserves each pack's runtime plugin and configuration identity. A singl
 ## Validation
 
 Release compilation and source/embedded bundle SHA-256 checks passed when the package was prepared. A combined loadout/launch test is still required.
+
+I-TGT was opened in Tutorial 3 and Depot Strike. Topographic rendering, mark creation, GPO-500 assignment and a normal-trigger coordinate release were verified in a mission. GPO-500 ammunition changed from 12 to 11 and its initialized seeker logged the assigned GPS coordinate. This does not establish impact accuracy or terminal acquisition for every supported weapon. See [I-TGT validation](docs/ITGT-VALIDATION.md) for the tested build and remaining checks.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 — 2026-10-08
+
+- Added an I-TGT GPS targeting MFD with a dark bezel, side buttons, grid, own-aircraft marker, up to 16 coordinate marks, zoom, pan, drag and resize. Open it with F6 or the I-TGT button during flight.
+- Added TYPE, PYLON and STORE assignments: program a weapon type, an entire pylon, or one mounted bomb/missile. Individual stores override their pylon and weapon type. The native release order is preserved, each release captures its coordinate, and unassigned compatible stores are held while GPS is armed.
+- Added terrain-derived shaded relief and 100 m contours. The topographic layer also replaces the native map background by default; contacts and native map controls remain available. Toggle this replacement with TOPO or the BepInEx configuration.
+- Rebuild the terrain layer when entering another mission or changing native map dimensions/background. Clear GPS marks and assignments on aircraft or mission changes.
+- Added coordinate releases for optical guided bombs, optical missiles, INS/optical cruise missiles, ballistic INS missiles and laser-guided bombs. Radar/IR lock weapons, unguided dispensers and high-drag submunitions are excluded. GPS mode is opt-in and available in single player or to the multiplayer host.
+- Preserved the coordinate for each releasing rail. Optical weapons can acquire an exposed enemy surface target near that point during terminal approach; laser terminal acquisition requires illumination. Blackout can use its existing coordinate activation path.
+- Reused the existing embedded weapon bundle. Live launch/impact validation is required before release.
+
 ## 1.0.3 — 2026-10-08
 
 - Corrected Eclipse dispenser collision isolation to include registered aircraft parts reparented outside the aircraft transform hierarchy. Version 1.0.2 missed these articulated bodies and did not resolve the reported wing reversal.
