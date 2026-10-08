@@ -12,7 +12,9 @@ Game: Nuclear Option 0.34, installed at `F:\Games\Nuclear.Option.v0.34.1`, with 
 
 The coordinate-release candidate DLL SHA-256 was `FE31731E3D7D268C8A6BD40C3049B4ABF1C78FFC04EA0F9B59651028831C3669`. Subsequent changes add optical distance/time refresh, restore the native half-second cruise waypoint cadence, and add per-pylon/per-store assignments with an unassigned-store guard and one-shot store assignment consumption. These changes require a further release test.
 
-Current build: zero compiler errors/warnings. Build output, repository `dist` and installed DLL all have SHA-256 `AEE8F1EA952E029B0F27B1594FA4750A38C409F73A9F7EC0A04691D2006D8B48`. The game was closed before installing this build, then restarted. Depot Strike loaded and its cockpit map displayed the generated terrain layer. Interactive scope tests were stopped when manual input was detected in the game window; TYPE/PYLON/STORE controls and precedence are not yet verified in a mission. The embedded Blueprinter bundle and serialized weapon assets were not changed.
+The scoped-assignment build had zero compiler errors/warnings. Its build output, repository `dist` and installed DLL matched SHA-256 `AEE8F1EA952E029B0F27B1594FA4750A38C409F73A9F7EC0A04691D2006D8B48`. The game was closed before installing this build, then restarted. Depot Strike loaded and its cockpit map displayed the generated terrain layer. Interactive scope tests were stopped when manual input was detected in the game window; TYPE/PYLON/STORE controls and precedence are not yet verified in a mission.
+
+After the user's pixelation feedback, terrain resolution was increased from 512×512 to 2048×2048, with trilinear filtering, mipmaps, and incremental terrain sampling/shading. This current build compiled with zero errors/warnings; build output and repository `dist` match SHA-256 `7EB1FF6306E7133FF32948154BF5671FEC492AEBECA17F88D1005E06C49057AF`. Visual quality, generation duration and frame pacing need a restarted-game check. The installed running game still uses the preceding scoped-assignment build. The embedded Blueprinter bundle and serialized weapon assets were not changed.
 
 ## Limits of this verification
 

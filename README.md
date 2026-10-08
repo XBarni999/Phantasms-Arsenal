@@ -53,7 +53,7 @@ When a target is available, the mine checks its attack corridor, reserves the ta
 
 ![I-TGT with a GPO-500 GPS assignment in a live mission](docs/images/itgt.png)
 
-During flight, press **F6** or click **I-TGT**. The MFD has a light topographic map in a dark bezel, 100 m contours, shaded relief, a north-up grid and an own-aircraft symbol. Terrain is sampled gradually after entering a mission; the map displays the generation progress.
+During flight, press **F6** or click **I-TGT**. The MFD has a light topographic map in a dark bezel, 100 m contours, shaded relief, a north-up grid and an own-aircraft symbol. The terrain layer is generated at 2048×2048 with filtered mipmaps. Terrain sampling and relief shading run gradually after entering a mission; the map displays the generation progress.
 
 1. Click the map to create a mark (up to 16). Coordinates are mission east/north positions in kilometres, with terrain elevation in metres; these are not real-world latitude/longitude.
 2. Select a compatible aircraft weapon using the normal game controls or **WPN**. Choose a mark with **PREV/NEXT**, then choose the assignment scope with **SCOPE**: **TYPE** assigns the weapon type, **PYLON** assigns a pylon, and **STORE** assigns one mounted bomb or missile. **SLOT** cycles the available stores; the display identifies their pylon and store number. Press **BIND** to save the assignment. Different pylons and individual stores can use different marks.

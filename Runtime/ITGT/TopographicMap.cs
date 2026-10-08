@@ -6,20 +6,21 @@ namespace PhantasmsArsenal.ITGT
     // Coordinates are stored in Datum space. Sampling always converts back to current local space.
     internal sealed class TopographicMap
     {
-        const int Resolution = 512;
+        const int Resolution = 2048;
         static readonly System.Reflection.FieldInfo MapDimensions = HarmonyLib.AccessTools.Field(typeof(DynamicMap), "mapDimensions");
         readonly float[] heights = new float[Resolution * Resolution];
         readonly bool[] ground = new bool[Resolution * Resolution];
         Image image;
         Sprite original, generated;
         Color originalColor;
-        Color[] basePixels;
-        int row;
+        Color32[] basePixels, pixels;
+        readonly System.Diagnostics.Stopwatch frameBudget = new System.Diagnostics.Stopwatch();
+        int row, shadedRow;
         bool attached;
         public Texture2D Texture { get; private set; }
         public Vector2 Size { get; private set; }
         public bool Ready => Texture;
-        public float Progress => row / (float)Resolution;
+        public float Progress => (row * .75f + shadedRow * .25f) / Resolution;
 
         public void Update(DynamicMap map, bool replace)
         {
@@ -39,11 +40,12 @@ namespace PhantasmsArsenal.ITGT
                 CopyBaseImage();
                 row = 0;
             }
-            // At most four rows per frame, so a map rebuild cannot stall a whole mission.
+            // Bound both terrain sampling and relief shading; larger maps build across frames.
             if (!Texture)
             {
-                int end = Mathf.Min(row + 4, Resolution);
-                for (; row < end; row++)
+                frameBudget.Restart();
+                int end = Mathf.Min(row + 16, Resolution);
+                for (; row < end && frameBudget.ElapsedMilliseconds < 3; row++)
                     for (int x = 0; x < Resolution; x++)
                     {
                         int i = row * Resolution + x;
@@ -81,7 +83,7 @@ namespace PhantasmsArsenal.ITGT
                 copy = new Texture2D(Resolution, Resolution, TextureFormat.RGBA32, false);
                 copy.ReadPixels(new Rect(0, 0, Resolution, Resolution), 0, 0);
                 copy.Apply();
-                basePixels = copy.GetPixels();
+                basePixels = copy.GetPixels32();
             }
             finally
             {
@@ -106,9 +108,12 @@ namespace PhantasmsArsenal.ITGT
 
         void Build()
         {
-            var pixels = new Color[heights.Length];
+            if (pixels == null) pixels = new Color32[heights.Length];
             float dx = Size.x / (Resolution - 1), dz = Size.y / (Resolution - 1);
-            for (int y = 0; y < Resolution; y++)
+            int end = Mathf.Min(shadedRow + 16, Resolution);
+            for (; shadedRow < end && frameBudget.ElapsedMilliseconds < 3; shadedRow++)
+            {
+                int y = shadedRow;
                 for (int x = 0; x < Resolution; x++)
                 {
                     int i = y * Resolution + x;
@@ -128,14 +133,17 @@ namespace PhantasmsArsenal.ITGT
                         if (contour) color = Color.Lerp(color, new Color(.39f, .32f, .22f), major ? .5f : .25f);
                     }
                     // Retain native cartographic detail as a faint layer beneath the contour lines.
-                    if (basePixels != null) color *= Mathf.Lerp(.85f, 1.03f, basePixels[i].grayscale);
+                    if (basePixels != null) color *= Mathf.Lerp(.85f, 1.03f, ((Color)basePixels[i]).grayscale);
                     color.a = 1;
                     pixels[i] = color;
                 }
-            Texture = new Texture2D(Resolution, Resolution, TextureFormat.RGBA32, false) { name = "I-TGT Topography", wrapMode = TextureWrapMode.Clamp };
-            Texture.SetPixels(pixels);
-            Texture.Apply(false, true);
+            }
+            if (shadedRow < Resolution) return;
+            Texture = new Texture2D(Resolution, Resolution, TextureFormat.RGBA32, true) { name = "I-TGT Topography", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Trilinear, anisoLevel = 2 };
+            Texture.SetPixels32(pixels);
+            Texture.Apply(true, true);
             generated = Sprite.Create(Texture, new Rect(0, 0, Resolution, Resolution), Vector2.one * .5f, original.pixelsPerUnit);
+            pixels = null; basePixels = null;
         }
 
         public void Dispose()
@@ -143,8 +151,8 @@ namespace PhantasmsArsenal.ITGT
             if (image && attached && image.sprite == generated) { image.sprite = original; image.color = originalColor; }
             if (generated) Object.Destroy(generated);
             if (Texture) Object.Destroy(Texture);
-            image = null; original = null; generated = null; Texture = null; basePixels = null;
-            attached = false; row = 0; Size = Vector2.zero;
+            image = null; original = null; generated = null; Texture = null; basePixels = null; pixels = null;
+            attached = false; row = 0; shadedRow = 0; Size = Vector2.zero;
         }
     }
 }
