@@ -1,5 +1,10 @@
 # Changelog
 
+## Documentation update — 2026-10-08
+
+- Translated GPS quick-start, planning and compatibility documentation into English and refreshed the test-release package.
+- Replaced the I-TGT screenshot with the user's current topographic-map capture.
+
 ## 1.1.4 — 2026-10-08 — test build
 
 - Gave GPS flight symbology a separate bright text style with a thin dark outline, fixing its dim colour multiplication without adding a background panel.

@@ -12,9 +12,11 @@ This prerelease adds an in-flight GPS planning screen to Phantasm's Arsenal: cre
 - A GPS-specific approach path for guided cluster dispensers, using a real exposed enemy near the mark and the native deployment mechanism.
 - The existing Poseidon, Killjoy, Apex and Circuit Breaker weapon packs in the same DLL; their embedded Blueprinter assets were reused.
 
+![I-TGT GPS screen](https://raw.githubusercontent.com/XBarni999/Phantasms-Arsenal/main/docs/images/itgt.png)
+
 ## Start here
 
-[One-minute Ukrainian quick start](https://github.com/XBarni999/Phantasms-Arsenal/blob/v1.1.4-test.1/docs/ITGT-QUICKSTART.uk.md) · [Detailed functions and multi-target planning guide](https://github.com/XBarni999/Phantasms-Arsenal/blob/v1.1.4-test.1/docs/ITGT-GUIDE.uk.md) · [Bomb/missile compatibility table](https://github.com/XBarni999/Phantasms-Arsenal/blob/v1.1.4-test.1/docs/GPS-WEAPONS.md)
+[One-minute quick start](https://github.com/XBarni999/Phantasms-Arsenal/blob/main/docs/ITGT-QUICKSTART.md) · [Detailed functions and multi-target planning guide](https://github.com/XBarni999/Phantasms-Arsenal/blob/main/docs/ITGT-GUIDE.md) · [Bomb/missile compatibility table](https://github.com/XBarni999/Phantasms-Arsenal/blob/main/docs/GPS-WEAPONS.md)
 
 For a first release: select compatible ordnance, press **F6**, create or import T01, leave **SCOPE = TYPE**, press **BIND**, then **ARM**. Check **NEXT GPS T01**, close the screen and use the normal weapon trigger. Change the opening key in **Settings → I-TGT GPS SETTINGS**. DISARM restores native targeting.
 

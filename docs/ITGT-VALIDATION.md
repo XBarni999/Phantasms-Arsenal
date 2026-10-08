@@ -1,5 +1,7 @@
 # I-TGT validation — 2026-10-08
 
+The current `docs/images/itgt.png` is a user-supplied capture of the topographic GPS screen. It replaces the earlier automated Depot Strike screenshot; earlier checks below remain historical evidence, not a claim about the replacement capture's build or mission.
+
 ## Live game checks
 
 Game: Nuclear Option 0.34, installed at `F:\Games\Nuclear.Option.v0.34.1`, with the user's existing BepInEx/Blueprinter plugins enabled.

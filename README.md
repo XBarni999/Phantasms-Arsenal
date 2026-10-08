@@ -4,7 +4,7 @@ One DLL containing four editable Blueprinter weapon packs and an **I-TGT GPS tar
 
 ![Blackout missile rendered in Unity](docs/images/blackout.png)
 
-[Download the DLL](https://github.com/XBarni999/Phantasms-Arsenal/raw/refs/heads/main/dist/Phantasms-Arsenal.dll) · [GPS quick start](docs/ITGT-QUICKSTART.uk.md) · [GPS planning guide](docs/ITGT-GUIDE.uk.md) · [Weapon gallery](docs/GALLERY.md) · [Editing guide](docs/EDITING.md)
+[Download the DLL](https://github.com/XBarni999/Phantasms-Arsenal/raw/refs/heads/main/dist/Phantasms-Arsenal.dll) · [GPS quick start](docs/ITGT-QUICKSTART.md) · [GPS planning guide](docs/ITGT-GUIDE.md) · [Weapon gallery](docs/GALLERY.md) · [Editing guide](docs/EDITING.md)
 
 | Pack | Weapons |
 | --- | --- |
@@ -51,9 +51,9 @@ When a target is available, the mine checks its attack corridor, reserves the ta
 
 ## I-TGT GPS screen
 
-![I-TGT with a GPO-500 GPS assignment in a live mission](docs/images/itgt.png)
+![I-TGT topographic GPS planning screen](docs/images/itgt.png)
 
-During flight, press **F6** (default). Change the binding in the game's **Settings → I-TGT GPS SETTINGS** panel: click the binding, then press a new key; Escape cancels. No launcher is displayed while the MFD is closed. The MFD has a light topographic map in a dark bezel, 100 m contours, shaded relief, a north-up grid and an aircraft silhouette with a white nose tip. The terrain layer is generated at 2048×2048 with filtered mipmaps. Terrain sampling and relief shading run gradually after entering a mission; the map displays the generation progress. See the [Ukrainian quick-start guide](docs/ITGT-GUIDE.uk.md).
+During flight, press **F6** (default). Change the binding in the game's **Settings → I-TGT GPS SETTINGS** panel: click the binding, then press a new key; Escape cancels. No launcher is displayed while the MFD is closed. The MFD has a light topographic map in a dark bezel, 100 m contours, shaded relief, a north-up grid and an aircraft silhouette with a white nose tip. The terrain layer is generated at 2048×2048 with filtered mipmaps. Terrain sampling and relief shading run gradually after entering a mission; the map displays the generation progress. See the [detailed planning guide](docs/ITGT-GUIDE.md).
 
 1. Click the map to create a mark (up to 16). Coordinates are mission east/north positions in kilometres, with terrain elevation in metres; these are not real-world latitude/longitude.
    Alternatively, select a Data Link target and press **DL→GPS** to copy the first selected target's known HQ position into a new mark. This saves a coordinate snapshot, not a moving target link.
