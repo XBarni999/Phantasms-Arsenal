@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1 — 2026-10-08
+
+- Reduced Blackout's prefab scale by 5%, including its collider, for additional ground clearance. In-mission clearance verification remains pending.
+- Rebuilt the combined Blueprinter bundle and DLL with the smaller Blackout.
+- Expanded the README with each weapon's purpose, targeting requirements, variants and limitations, including Blackout's effects on friendly aircraft.
+- Fixed Poseidon gallery face culling and orientation, improved preview materials and removed the duplicate aircraft-variant image.
+- Removed repository helper tools while retaining runtime source, editable assets and documentation.
+
 ## 1.0.0 — 2026-10-08
 
 - Combined Poseidon, HSM-290 Killjoy, Apex and Circuit Breaker assets in one Blueprinter bundle embedded in one DLL.
