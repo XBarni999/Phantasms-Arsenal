@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1706624141, guid: 06dd3d5416bf43ea368cc39ff96e6d5a, type: 3}
+  m_Name: WI_R460_Poseidon_Nuclear
+  m_EditorClassIdentifier: 
+  weaponPrefab: {fileID: 8817781765866835162, guid: 51be72658e8a4a04b3dfd2b1ce5bd426,
+    type: 3}
+  effectiveness:
+    antiSurface: 1
+    antiAir: 0
+    antiMissile: 0
+    antiRadar: 0
+  targetRequirements:
+    lineOfSight: 0
+    minAltitude: 0
+    maxAltitude: 50
+    minRange: 500
+    maxRange: 200000
+    maxSpeed: 100
+    minIR: 0
+    minRadar: 0
+    minAlignment: 30
+    minOwnerSpeed: 0
+    minValue: 0
+  pK: 250
+  weaponName: R-460N Poseidon (1.5 kt)
+  shortName: R-460N
+  description: Tactical nuclear R-460 Poseidon. 1.5-kiloton warhead for concentrated
+    ship and convoy targets.
+  fireInterval: 0.5
+  muzzleVelocity: 0
+  maxSpeed: 500
+  dragCoef: 0.3
+  gravMult: 1
+  pierceDamage: 500
+  blastDamage: 500
+  weaponIcon: {fileID: 21300000, guid: 36df0f07af4c47fb9b9e6ca248a88d48, type: 3}
+  armorTierEffectiveness: 8
+  airburstHeight: 0
+  visibilityWhenFired: 0
+  costPerRound: 34
+  massPerRound: 1000
+  useWeaponDoors: 1
+  boresight: 0
+  laserGuided: 0
+  missile: 1
+  bomb: 0
+  glideBomb: 0
+  gun: 0
+  overHorizon: 1
+  nuclear: 1
+  strategic: 0
+  energy: 0
+  jammer: 0
+  troops: 0
+  hideInDisplay: 0
+  cargo: 0
+  rearmGround: 0
+  rearmShip: 0
+  sling: 0

@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>Phantasms-Arsenal</AssemblyName>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GameDir Condition="'$(GameDir)' == ''">F:\Games\Nuclear.Option.v0.34.1</GameDir>
+    <Managed>$(GameDir)\NuclearOption_Data\Managed</Managed>
+    <BlueprinterProject Condition="'$(BlueprinterProject)' == ''">F:\NCMod\Blueprinter-Editor</BlueprinterProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(GameDir)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(GameDir)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(BlueprinterProject)\Packages\nuclearoption\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mirage">
+      <HintPath>$(Managed)\Mirage.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>$(Managed)\netstandard.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(Managed)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(Managed)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(Managed)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule">
+      <HintPath>$(Managed)\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(Managed)\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(Managed)\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>$(Managed)\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(Managed)\UnityEngine.AudioModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(Managed)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(Managed)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Killjoy\Plugin.cs" />
+    <Compile Include="Killjoy\KilljoyFlight.cs" />
+    <Compile Include="Killjoy\LoftProfile.cs" />
+    <Compile Include="Killjoy\LaunchEnvelope.cs" />
+    <Compile Include="Killjoy\GuidanceMath.cs" />
+    <Compile Include="CircuitBreaker\Plugin.cs" />
+    <Compile Include="CircuitBreaker\BlackoutFlight.cs" />
+    <Compile Include="CircuitBreaker\Locust.cs" />
+    <Compile Include="CircuitBreaker\SmartMineController.cs" />
+    <Compile Include="CircuitBreaker\TargetReservations.cs" />
+    <Compile Include="CircuitBreaker\LocustDeploymentRules.cs" />
+    <Compile Include="CircuitBreaker\Suppression.cs" />
+    <Compile Include="CircuitBreaker\ExhaustHeat.cs" />
+    <Compile Include="CircuitBreaker\DescentProfile.cs" />
+    <Compile Include="CircuitBreaker\TerrainPreview.cs" />
+    <Compile Include="CircuitBreaker\Datalink.cs" />
+    <Compile Include="CircuitBreaker\HpmRules.cs" />
+    <Compile Include="Apex\Plugin.cs" />
+    <Compile Include="Apex\Pallet.cs" />
+    <Compile Include="Poseidon\PoseidonTELRuntime.cs" />
+    <Compile Include="ArsenalPlugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Bundles\Phantasm's Arsenal_1.0.0.nobp" LogicalName="Arsenal.Weapons.nobp" />
+  </ItemGroup>
+</Project>

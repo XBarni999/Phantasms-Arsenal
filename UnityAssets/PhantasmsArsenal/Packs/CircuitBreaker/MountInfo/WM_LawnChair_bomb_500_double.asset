@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 552909734, guid: 06dd3d5416bf43ea368cc39ff96e6d5a, type: 3}
+  m_Name: WM_LawnChair_bomb_500_double
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 5263609273566658842, guid: 26f96cc1373f47f8b0a9e793a719bb6c, type: 3}
+  jsonKey: CB_LawnChair_bomb_500_double
+  info: {fileID: 11400000, guid: 7dfc2fe1d4904700b976da51f7d07605, type: 2}
+  mountName: CBU-82S Lawn Chair x2
+  ammo: 2
+  turret: 0
+  missileBay: 0
+  radar: 0
+  tailHook: 0
+  slingloadHook: 0
+  countermeasure: 0
+  colorable: 0
+  Cargo: 0
+  Troops: 0
+  sortWeapons: 1
+  GearSafety: 1
+  GroundSafety: 1
+  GunAmmo: 0
+  emptyCost: 0
+  emptyMass: 0
+  mass: 800
+  drag: 0.4
+  emptyDrag: 0.02
+  RCS: 0.15
+  emptyRCS: 0.002
+  disabled: 0
+  isEventContent: 0
+  dontAutomaticallyAddToEncyclopedia: 0

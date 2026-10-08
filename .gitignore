@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+verification/unity.request
+verification/*.result
+*.pdb
+*.user
+GitHub-Api.py
+verification/*.nobp
