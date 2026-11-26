@@ -18,6 +18,8 @@ MonoBehaviour:
     hardpointIndices: 0100000002000000
   - aircraftJsonKey: trainer
     hardpointIndices: 00000000
+  - aircraftJsonKey: CASLight1
+    hardpointIndices: 0000000001000000020000000300000004000000050000000600000007000000
   - aircraftJsonKey: EW1
     hardpointIndices: 01000000
   - aircraftJsonKey: FastBomber1

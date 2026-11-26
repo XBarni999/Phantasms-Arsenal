@@ -16,7 +16,8 @@ namespace CircuitBreaker
         public static bool ActiveUnit(Unit u)=>u&&affectedUnits.TryGetValue(u,out var expiry)&&HpmRules.SuppressionActive(Time.time,expiry);
         public static bool ActiveAircraft(Aircraft a)=>a&&affectedAircraft.TryGetValue(a,out var expiry)&&HpmRules.SuppressionActive(Time.time,expiry);
         public static bool IsActivator(Unit u){
-            if(!u||u.disabled||u is Missile||u is Aircraft||u is Ship)return false;
+            if(!u||u.disabled||u is Missile||u is Aircraft)return false;
+            if(u is Ship)return HpmRules.Activates(false,true,false,false,false);
             bool radar=u.radar is Radar attached&&attached.RadarParameters.maxRange>0;
             foreach(var r in u.GetComponentsInChildren<Radar>(true))radar|=r.RadarParameters.maxRange>0;
             bool sam=false;

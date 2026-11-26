@@ -26,6 +26,8 @@ MonoBehaviour:
     hardpointIndices: 03000000
   - aircraftJsonKey: trainer
     hardpointIndices: 01000000
+  - aircraftJsonKey: CASLight1
+    hardpointIndices: 0000000001000000020000000300000004000000050000000600000007000000
   - aircraftJsonKey: 1509_palafighter1
     hardpointIndices: 0100000002000000
   - aircraftJsonKey: Aryx_F16M_KingViper
@@ -38,3 +40,9 @@ MonoBehaviour:
     hardpointIndices: 04000000050000000600000007000000
   - aircraftJsonKey: XFS21
     hardpointIndices: 0300000004000000
+  - aircraftJsonKey: F4EPhantom
+    hardpointIndices: 02000000
+  - aircraftJsonKey: mig29_Fulcrum
+    hardpointIndices: 02000000
+  - aircraftJsonKey: mig29smt_Fulcrum
+    hardpointIndices: 02000000

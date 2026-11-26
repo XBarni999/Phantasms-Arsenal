@@ -28,6 +28,8 @@ MonoBehaviour:
     hardpointIndices: 010000000200000003000000
   - aircraftJsonKey: trainer
     hardpointIndices: 00000000
+  - aircraftJsonKey: CASLight1
+    hardpointIndices: 0000000001000000020000000300000004000000050000000600000007000000
   - aircraftJsonKey: Aryx_F22E_StrikeRaptor
     hardpointIndices: 0200000003000000
   - aircraftJsonKey: Aryx_Interceptor1
@@ -38,3 +40,5 @@ MonoBehaviour:
     hardpointIndices: 0200000003000000
   - aircraftJsonKey: XFS21
     hardpointIndices: 0100000002000000
+  - aircraftJsonKey: F4EPhantom
+    hardpointIndices: 01000000

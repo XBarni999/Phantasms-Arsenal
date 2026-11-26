@@ -9,3 +9,5 @@ verification/*.nobp
 verification/materials-*.txt
 verification/*.log
 verification/itgt-api/
+dist/backups/
+verification/arsenal-112-sync.txt

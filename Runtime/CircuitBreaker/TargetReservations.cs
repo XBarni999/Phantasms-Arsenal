@@ -15,7 +15,7 @@ namespace CircuitBreaker
     }
     internal static class SmartMineRules
     {
-        public const float Radius=70, Lifetime=300, ScanInterval=.75f, LaunchHeight=80, TerminalSpeed=18;
+        public const float Radius=90, Lifetime=300, ScanInterval=.75f, ArmingDelay=4, ScanDelay=5, LaunchHeight=40, TerminalSpeed=18, StrikeSpeed=100;
         public const float JumpGravity=9.81f;
         public static float JumpApexTime=>(float)System.Math.Sqrt(2*LaunchHeight/JumpGravity);
         public static float JumpHeight(float time){float t=System.Math.Max(0,System.Math.Min(time,JumpApexTime));return JumpGravity*JumpApexTime*t-.5f*JumpGravity*t*t;}

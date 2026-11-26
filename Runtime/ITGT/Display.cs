@@ -19,6 +19,7 @@ namespace PhantasmsArsenal.ITGT
         readonly DesignationCycle<Mark> cycle = new DesignationCycle<Mark>();
         enum BindingScope { Cycle, Type, Pylon, Store }
         BindingScope bindingScope;
+        bool advancedBindings;
         int selectedStore;
         readonly TopographicMap topography = new TopographicMap();
         ConfigEntry<KeyCode> toggle;
@@ -31,6 +32,8 @@ namespace PhantasmsArsenal.ITGT
         bool visible, armed, resizing;
         bool positioned;
         bool capturingKey;
+        bool captureArmKey;
+        ConfigEntry<KeyCode> armKey;
         int selected, nextID = 1;
         Vector2 center;
         float span = 40000;
@@ -96,7 +99,8 @@ namespace PhantasmsArsenal.ITGT
             instance = this;
             var config = GetComponent<ArsenalPlugin>().Config;
             toggle = config.Bind("I-TGT", "ToggleKey", KeyCode.F6, "Open or close the GPS targeting MFD.");
-            replaceMap = config.Bind("I-TGT", "TopographicGameMap", true, "Use the generated relief and 100 m contours on the native map too.");
+            armKey = config.Bind("I-TGT", "ArmKey", KeyCode.F7, "Arm or disarm GPS targeting without opening the MFD.");
+            replaceMap = config.Bind("I-TGT", "TopographicGameMap", false, "Use the generated relief and 100 m contours on the native map too.");
             windowWidth = config.Bind("I-TGT", "WindowWidth", 620f, new ConfigDescription("MFD width in pixels.", new AcceptableValueRange<float>(480, 1200)));
             windowHeight = config.Bind("I-TGT", "WindowHeight", 640f, new ConfigDescription("MFD height in pixels.", new AcceptableValueRange<float>(540, 1200)));
             window = new Rect(Mathf.Max(8, Screen.width - windowWidth.Value - 24), 120, windowWidth.Value, windowHeight.Value);
@@ -118,15 +122,20 @@ namespace PhantasmsArsenal.ITGT
         }
         void DrawSettings()
         {
-            var panel = new Rect(Screen.width - 336, Screen.height - 178, 312, 144);
+            var panel = new Rect(Screen.width - 336, Screen.height - 218, 312, 184);
             Fill(panel, new Color(.075f, .10f, .09f, .97f));
             GUI.Label(new Rect(panel.x + 12, panel.y + 8, 288, 24), "I-TGT GPS SETTINGS", label);
-            if (Button(new Rect(panel.x + 12, panel.y + 40, 288, 30), capturingKey ? "PRESS KEY  /  ESC CANCELS" : "OPEN / CLOSE: " + toggle.Value)) capturingKey = true;
-            if (Button(new Rect(panel.x + 12, panel.y + 78, 288, 26), "NATIVE TOPO MAP: " + (replaceMap.Value ? "ON" : "OFF"))) replaceMap.Value = !replaceMap.Value;
-            GUI.Label(new Rect(panel.x + 12, panel.y + 110, 288, 22), "Binding saves automatically", small);
+            if (Button(new Rect(panel.x + 12, panel.y + 40, 288, 30), capturingKey && !captureArmKey ? "PRESS KEY  /  ESC CANCELS" : "OPEN / CLOSE: " + toggle.Value))
+            { capturingKey = true; captureArmKey = false; }
+            if (Button(new Rect(panel.x + 12, panel.y + 78, 288, 30), capturingKey && captureArmKey ? "PRESS KEY  /  ESC CANCELS" : "ARM / DISARM GPS: " + armKey.Value))
+            { capturingKey = true; captureArmKey = true; }
+            if (Button(new Rect(panel.x + 12, panel.y + 116, 288, 26), "MAP: " + MapMode)) ToggleMap();
+            GUI.Label(new Rect(panel.x + 12, panel.y + 148, 288, 22), "Bindings save automatically", small);
             var e = Event.current;
             if (!capturingKey || e.type != EventType.KeyDown || e.keyCode == KeyCode.None) return;
-            if (e.keyCode != KeyCode.Escape) { toggle.Value = e.keyCode; GetComponent<ArsenalPlugin>().Config.Save(); }
+            var binding = captureArmKey ? armKey : toggle;
+            if (e.keyCode != KeyCode.Escape && e.keyCode != (captureArmKey ? toggle.Value : armKey.Value))
+            { binding.Value = e.keyCode; binding.ConfigFile.Save(); }
             capturingKey = false; e.Use();
         }
         void Update()
@@ -152,6 +161,9 @@ namespace PhantasmsArsenal.ITGT
             }
             topography.Update(SceneSingleton<DynamicMap>.i, replaceMap.Value);
             if (!capturingKey && !CursorManager.GetFlag(CursorFlags.GameMenu) && Input.GetKeyDown(toggle.Value)) SetVisible(!visible);
+            if (!capturingKey && !DynamicMap.mapMaximized &&
+                (CursorManager.GetFlags() & ~DisplayCursor) == CursorFlags.None &&
+                armKey.Value != toggle.Value && Input.GetKeyDown(armKey.Value)) ToggleArmed(true);
             if (visible && Input.GetKeyDown(KeyCode.Escape)) SetVisible(false);
         }
         void SetVisible(bool value)
@@ -193,79 +205,108 @@ namespace PhantasmsArsenal.ITGT
             }
             finally { GUI.color = previousColor; GUI.backgroundColor = previousBackground; }
         }
-        bool Button(Rect rect, string title)
+        bool Button(Rect rect, string title, bool primary = false, bool enabled = true)
         {
             bool hover = rect.Contains(Event.current.mousePosition);
             bool down = hover && Input.GetMouseButton(0);
-            bool accent = title.Contains("GPS ON") || (title == "GPS" && armed) || title == "BIND";
+            bool accent = primary;
             Fill(new Rect(rect.x + 2, rect.y + 3, rect.width, rect.height), new Color(0, 0, 0, .35f));
             Fill(rect, hover ? new Color(.43f, .62f, .55f) : new Color(.27f, .35f, .32f));
             Fill(new Rect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2), down ? new Color(.10f, .18f, .15f) :
                 accent ? new Color(.16f, .32f, .25f) : hover ? new Color(.24f, .32f, .29f) : new Color(.17f, .22f, .20f));
             Fill(new Rect(rect.x + 3, rect.y + 2, rect.width - 6, 1), new Color(.65f, .8f, .71f, down ? .1f : .3f));
-            return GUI.Button(rect, title, button);
+            bool wasEnabled = GUI.enabled;
+            GUI.enabled = wasEnabled && enabled;
+            try { return GUI.Button(rect, title, button); }
+            finally { GUI.enabled = wasEnabled; }
         }
         void Fill(Rect rect, Color color)
         {
             var saved = GUI.color; GUI.color = color; GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = saved;
         }
+        string MapMode => replaceMap.Value ? "TOPOGRAPHIC" : "STANDARD";
+
+        void ToggleMap()
+        {
+            replaceMap.Value = !replaceMap.Value;
+            replaceMap.ConfigFile.Save();
+        }
+
         void DrawWindow(int id)
         {
             float w = window.width, h = window.height;
-            Fill(new Rect(0, 0, w, h), new Color(.09f, .105f, .10f, .98f));
-            Fill(new Rect(9, 9, w - 18, h - 18), new Color(.15f, .17f, .16f));
-            GUI.Label(new Rect(95, 14, w - 155, 28), "I-TGT   /   GPS TARGETING", label);
-            if (Button(new Rect(39, 12, 48, 28), "WPN")) Aircraft.weaponManager?.NextWeaponStation();
-            if (Button(new Rect(w - 45, 12, 30, 28), "X")) SetVisible(false);
-            Fill(new Rect(20, 21, 9, 9), armed ? new Color(.3f, .95f, .3f) : new Color(.35f, .39f, .35f));
-            mapRect = new Rect(64, 104, w - 128, h - 244);
+            Fill(new Rect(0, 0, w, h), new Color(.055f, .08f, .085f, .99f));
+            Fill(new Rect(0, 0, w, 3), new Color(.31f, .75f, .63f));
+            GUI.Label(new Rect(16, 9, w - 60, 28), "I-TGT  /  GPS targeting", label);
+            if (Button(new Rect(w - 40, 9, 28, 28), "×")) SetVisible(false);
+            mapRect = new Rect(12, 116, w - 144, h - 228);
             var station = Aircraft.weaponManager?.currentWeaponStation;
             var info = station?.WeaponInfo;
             var stores = AvailableStores(station);
             selectedStore = Mathf.Clamp(selectedStore, 0, Mathf.Max(0, stores.Count - 1));
             var selectedMount = stores.Count > 0 ? stores[selectedStore] : null;
             var nextMount = Guidance.NextStore(station);
-            bool compatible = Guidance.Supports(info);
-            string weapon = info ? info.weaponName : "NO WEAPON";
+            string weapon = info ? info.weaponName : "No weapon selected";
             var assigned = Assignment(nextMount);
-            string assignment = assigned != null ? "T" + assigned.id.ToString("00") : "NONE";
-            GUI.Label(new Rect(58, 49, w - 116, 24), weapon + "  /  NEXT GPS " + assignment, small);
+            string assignment = assigned != null ? "T" + assigned.id.ToString("00") : "—";
+            Fill(new Rect(12, 44, w - 24, 38), new Color(.10f, .15f, .15f));
+            if (Button(new Rect(18, 49, 102, 28), "Change weapon")) Aircraft.weaponManager?.NextWeaponStation();
+            GUI.Label(new Rect(123, 47, w - 270, 32), weapon, small);
+            GUI.Label(new Rect(w - 145, 47, 127, 32), "Next release  " + assignment, label);
             string scope = bindingScope == BindingScope.Cycle ? "CYCLE" : bindingScope == BindingScope.Type ? "TYPE" : bindingScope == BindingScope.Pylon ? "PYLON" : "STORE";
             string slot = selectedMount ? StoreLabel(selectedMount, station) : "NO STORE";
-            GUI.Label(new Rect(58, 74, w - 116, 22), (armed ? "GPS ON" : "GPS OFF") + "  /  BIND: " + scope + "  /  " + slot, small);
-            if (Button(new Rect(14, 112, 43, 34), "+")) Zoom(.7f);
-            if (Button(new Rect(14, 160, 43, 34), "−")) Zoom(1.4f);
-            if (Button(new Rect(14, 208, 43, 34), "OWN")) { var p = Aircraft.GlobalPosition(); center = new Vector2(p.x, p.z); }
-            if (Button(new Rect(14, 256, 43, 34), "TGT") && Active != null) center = new Vector2(Active.point.x, Active.point.z);
-            if (Button(new Rect(14, 304, 43, 34), "TOPO")) replaceMap.Value = !replaceMap.Value;
-            if (Button(new Rect(14, 352, 43, 34), "SCOPE")) bindingScope = (BindingScope)(((int)bindingScope + 1) % 4);
-            if (Button(new Rect(14, 400, 43, 34), "DL→GPS")) ImportDatalink();
-            if (Button(new Rect(w - 57, 352, 43, 34), "SLOT") && stores.Count > 0) selectedStore = (selectedStore + 1) % stores.Count;
-            if (Button(new Rect(w - 57, 112, 43, 34), "PREV") && marks.Count > 0) selected = (selected + marks.Count - 1) % marks.Count;
-            if (Button(new Rect(w - 57, 160, 43, 34), "NEXT") && marks.Count > 0) selected = (selected + 1) % marks.Count;
-            if (Button(new Rect(w - 57, 208, 43, 34), "DEL")) Delete();
-            if (Button(new Rect(w - 57, 256, 43, 34), "BIND")) Bind(info, selectedMount);
-            if (Button(new Rect(w - 57, 304, 43, 34), "GPS"))
+            GUI.Label(new Rect(12, 87, w - 24, 22), "Click map to mark  →  Arm GPS  →  Release normally", small);
+            float x = w - 124;
+            if (Button(new Rect(x, 116, 52, 28), "Zoom +")) Zoom(.7f);
+            if (Button(new Rect(x + 60, 116, 52, 28), "Zoom −")) Zoom(1.4f);
+            if (Button(new Rect(x, 146, 112, 28), "Center aircraft")) { var p = Aircraft.GlobalPosition(); center = new Vector2(p.x, p.z); }
+            if (Button(new Rect(x, 176, 112, 28), "Center mark", enabled: Active != null))
+                center = new Vector2(Active.point.x, Active.point.z);
+            if (Button(new Rect(x, 206, 112, 28), replaceMap.Value ? "Topography on" : "Topography off")) ToggleMap();
+            if (Button(new Rect(x, 236, 112, 28), "Import Data Link")) ImportDatalink();
+            if (Button(new Rect(x, 266, 52, 28), "Prev", enabled: marks.Count > 1)) selected = (selected + marks.Count - 1) % marks.Count;
+            if (Button(new Rect(x + 60, 266, 52, 28), "Next", enabled: marks.Count > 1)) selected = (selected + 1) % marks.Count;
+            if (Button(new Rect(x, 296, 112, 28), "Delete mark", enabled: Active != null)) Delete();
+            if (Button(new Rect(x, 326, 112, 28), advancedBindings ? "Hide bindings" : "Weapon bindings", advancedBindings))
+                advancedBindings = !advancedBindings;
+            if (advancedBindings)
             {
-                if (armed) armed = false;
-                else if (!Aircraft.IsServer) message = "GPS release: single player / host only";
-                else if (compatible && Active != null) { if (bindingScope != BindingScope.Cycle) Bind(info, selectedMount); else assignments.Remove(info.name); armed = true; }
-                else message = "Select a compatible weapon and create a mark";
+                if (Button(new Rect(x, 356, 112, 22), "Mode: " + scope))
+                    bindingScope = (BindingScope)(((int)bindingScope + 1) % 4);
+                if (Button(new Rect(x, 380, 112, 22), slot, enabled: stores.Count > 0))
+                    selectedStore = (selectedStore + 1) % stores.Count;
+                if (Button(new Rect(x, 404, 112, 22), bindingScope == BindingScope.Cycle ? "Reset sequence" : "Bind mark", enabled: Active != null))
+                    Bind(info, selectedMount);
             }
             DrawMap();
-            float bottom = h - 126;
+            float bottom = h - 108;
+            Fill(new Rect(12, bottom, w - 24, 64), new Color(.10f, .15f, .15f));
             GUI.Label(new Rect(56, bottom, w - 112, 24), Active == null ? "NO MARK  /  CLICK MAP TO DESIGNATE" :
                 $"T{Active.id:00}   E {Active.point.x / 1000:0.000} km   N {Active.point.z / 1000:0.000} km   H {Active.point.y:0} m", small);
-            GUI.Label(new Rect(40, bottom + 26, w - 80, 22), compatible ? (Aircraft.IsServer ? message : "GPS RELEASE AVAILABLE TO HOST ONLY") : "Selected weapon does not support coordinate guidance", small);
-            GUI.Label(new Rect(56, bottom + 50, w - 112, 22), $"RANGE {span / 1000:0.0} km   /   CONTOURS 100 m   /   NORTH UP", small);
-            if (Button(new Rect(w / 2 - 90, h - 42, 180, 28), armed ? "GPS ON  •  DISARM" : "GPS OFF  •  ARM"))
-            {
-                if (armed) armed = false;
-                else if (Aircraft.IsServer && compatible && Active != null) { if (bindingScope != BindingScope.Cycle) Bind(info, selectedMount); else assignments.Remove(info.name); armed = true; }
-                else message = "Select a compatible weapon and create a mark (host)";
-            }
+            string hint = Guidance.WeaponHint(info);
+            string help = hint ?? (Active == null ? "Left-click to mark  /  Right-drag to pan  /  Scroll to zoom" : message);
+            GUI.Label(new Rect(32, bottom + 26, w - 64, 22), Aircraft.IsServer ? help : "GPS RELEASE AVAILABLE TO HOST ONLY", small);
+            GUI.Label(new Rect(12, h - 42, 125, 28), $"{span / 1000:0.#} km  /  {(armed ? "GPS ON" : "GPS OFF")}", small);
+            if (Button(new Rect(w / 2 - 105, h - 42, 210, 28), (armed ? "Disarm GPS" : "Arm GPS") + " [" + armKey.Value + "]", true))
+                ToggleArmed(false);
             Resize(new Rect(w - 30, h - 30, 24, 24));
-            GUI.DragWindow(new Rect(45, 0, w - 100, 45));
+            GUI.DragWindow(new Rect(12, 3, w - 60, 36));
+        }
+        void ToggleArmed(bool notify)
+        {
+            var aircraft = Aircraft;
+            if (!aircraft || aircraft.disabled) return;
+            var station = aircraft.weaponManager?.currentWeaponStation;
+            var mark = Assignment(Guidance.NextStore(station));
+            if (armed) { armed = false; message = "GPS disarmed"; }
+            else if (!aircraft.IsServer) message = "GPS release is available to the host";
+            else if (!Guidance.Supports(station?.WeaponInfo)) message = Guidance.WeaponHint(station?.WeaponInfo);
+            else if (Active == null) message = $"Open I-TGT [{toggle.Value}] and place a mark";
+            else if (mark == null) message = "No GPS assignment for the next store";
+            else { armed = true; message = $"GPS armed for next release: T{mark.id:00}"; }
+
+            var report = SceneSingleton<AircraftActionsReport>.i;
+            if (notify && report) report.ReportText(message, 3);
         }
         static List<MountedMissile> AvailableStores(WeaponStation station)
         {
@@ -327,11 +368,14 @@ namespace PhantasmsArsenal.ITGT
             GUI.BeginGroup(mapRect);
             float width = mapRect.width, height = mapRect.height;
             float vertical = span * height / width;
-            if (topography.Ready)
+            bool relief = replaceMap.Value && topography.Ready;
+            var mapTexture = relief ? topography.Texture : topography.StandardTexture;
+            if (mapTexture)
             {
                 var size = topography.Size;
-                GUI.DrawTextureWithTexCoords(new Rect(0, 0, width, height), topography.Texture,
-                    new Rect((center.x - span / 2) / size.x + .5f, (center.y - vertical / 2) / size.y + .5f, span / size.x, vertical / size.y));
+                var uv = new Rect((center.x - span / 2) / size.x + .5f, (center.y - vertical / 2) / size.y + .5f, span / size.x, vertical / size.y);
+                GUI.DrawTextureWithTexCoords(new Rect(0, 0, width, height), mapTexture, relief ? uv : topography.StandardUV(uv));
+                if (!relief) topography.DrawSatellite(new Rect(0, 0, width, height), uv);
             }
             else GUI.Label(new Rect(10, 10, width - 20, 50), $"SAMPLING TERRAIN  {topography.Progress:P0}", GUI.skin.label);
             float grid = span > 30000 ? 10000 : span > 12000 ? 5000 : span > 4000 ? 1000 : 250;
@@ -384,7 +428,7 @@ namespace PhantasmsArsenal.ITGT
                 {
                     TopographicMap.Height(point, out var elevation); point.y = elevation;
                     marks.Add(new Mark { id = nextID++, point = point }); selected = marks.Count - 1;
-                    message = "Mark created: BIND to weapon, then ARM GPS";
+                    message = bindingScope == BindingScope.Cycle ? "Mark created: check next release, then arm GPS" : "Mark created: use BIND, then arm GPS";
                 }
                 e.Use();
             }

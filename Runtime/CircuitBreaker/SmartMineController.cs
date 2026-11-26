@@ -36,6 +36,8 @@ namespace CircuitBreaker
                 previous=transform.position;return;
             }
             if(Time.time-landedAt>=SmartMineRules.Lifetime){Retire();return;}
+            if(Time.time-landedAt<4)return;
+            if(Time.time-landedAt<SmartMineRules.ScanDelay)return;
             if(Time.time<nextScan)return;nextScan=Time.time+SmartMineRules.ScanInterval;
             Scan();
         }
@@ -108,7 +110,7 @@ namespace CircuitBreaker
             if(!AttackPathClear(next,attackTarget)){Retire();return;}
             try{
                 Unit owner=missile;if(missile.ownerID.TryGetUnit(out var launcher)&&launcher)owner=launcher;
-                var strike=NetworkSceneSingleton<Spawner>.i.SpawnMissile(strikeInfo.weaponPrefab,next,Quaternion.LookRotation(line),line.normalized*25,attackTarget,owner);
+                var strike=NetworkSceneSingleton<Spawner>.i.SpawnMissile(strikeInfo.weaponPrefab,next,Quaternion.LookRotation(line),line.normalized*SmartMineRules.StrikeSpeed,attackTarget,owner);
                 if(strike){strike.NetworkHQ=missile.NetworkHQ;strike.NetworkownerID=missile.ownerID;strikeLaunched=true;}
             }catch(System.Exception e){Plugin.Diagnostic?.Invoke("Smart mine GS25 launch failed: "+e.Message);}
             Retire();

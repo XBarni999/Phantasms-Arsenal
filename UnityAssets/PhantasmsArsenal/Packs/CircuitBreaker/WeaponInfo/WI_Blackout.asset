@@ -43,7 +43,7 @@ MonoBehaviour:
   dragCoef: 0.3
   gravMult: 1
   pierceDamage: 5
-  blastDamage: 2
+  blastDamage: 20
   weaponIcon: {fileID: 21300000, guid: 2f9aaf5fa3fb40bcb9a589ffd975f957, type: 3}
   armorTierEffectiveness: 9
   airburstHeight: 0

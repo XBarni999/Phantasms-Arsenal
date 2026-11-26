@@ -39,7 +39,13 @@ namespace CircuitBreaker
             for(int pair=0;pair<2;pair++){
                 int i=released++;
                 float row=i/2;float vy=missile.rb.velocity.y;float t=Mathf.Max(.3f,(vy+Mathf.Sqrt(vy*vy+2*9.81f*height))/9.81f);
-                Vector3 v=missile.rb.velocity+forward*((row-1.5f)*50f/t)+right*((i%2==0?-20f:20f)/t);
+                // Keep the broad four-pair footprint while breaking up the two perfectly straight mine lines.
+                bool contact = mineInfo.name == "WI_LocustMine";
+                float longitudinalJitter=UnityEngine.Random.Range(-9f,9f);
+                float lateral = i % 2 == 0 ? -20f : 20f;
+                if (contact && (i / 2) % 2 == i % 2) lateral = 0f;
+                float lateralJitter = UnityEngine.Random.Range(lateral == 0f ? -2f : -6f, lateral == 0f ? 2f : 6f);
+                Vector3 v=missile.rb.velocity+forward*((row-1.5f)*50f+longitudinalJitter)/t+right*(lateral+lateralJitter)/t;
                 Vector3 port=transform.TransformPoint(new Vector3(i%2==0?-.13f:.13f,-.32f,-.55f+row*.35f));
                 NetworkSceneSingleton<Spawner>.i.SpawnMissile(mineInfo.weaponPrefab,port,Quaternion.identity,v,null,missile);
             }
@@ -49,6 +55,7 @@ namespace CircuitBreaker
     }
     public sealed class LocustMine : MonoBehaviour
     {
+        const float TriggerRadius = 5f;
         Missile missile; float landedAt,check; Vector3 previous; bool exploded; SphereCollider trigger;
         readonly Collider[] overlaps=new Collider[64];
         public bool Grounded {get;private set;}
@@ -61,14 +68,14 @@ namespace CircuitBreaker
                 if(missile.timeSinceSpawn>.1f && Physics.Raycast(previous+Vector3.up*.2f,step.sqrMagnitude>.001f?step.normalized:Vector3.down,out var hit,step.magnitude+.4f,PhysicsLayers.StaticsMask,QueryTriggerInteraction.Ignore)){
                     transform.position=hit.point+hit.normal*.09f;transform.rotation=Quaternion.FromToRotation(Vector3.up,hit.normal);
                     missile.rb.velocity=Vector3.zero;missile.rb.angularVelocity=Vector3.zero;missile.rb.isKinematic=true;Grounded=true;landedAt=Time.time;
-                    trigger=gameObject.AddComponent<SphereCollider>();trigger.radius=3;trigger.isTrigger=true;missile.Arm();
+                    trigger=gameObject.AddComponent<SphereCollider>();trigger.radius=TriggerRadius;trigger.isTrigger=true;missile.Arm();
                 }
                 previous=transform.position;return;
             }
             if(Time.time-landedAt>=Plugin.MineLife.Value){Explode();return;}
             if(Time.time-landedAt<4||Time.time<check)return;check=Time.time+.1f;
             // Poll also catches a vehicle already overlapping at arming time.
-            int count=Physics.OverlapSphereNonAlloc(transform.position,3,overlaps,PhysicsLayers.Everything,QueryTriggerInteraction.Ignore);
+            int count=Physics.OverlapSphereNonAlloc(transform.position,TriggerRadius,overlaps,PhysicsLayers.Everything,QueryTriggerInteraction.Ignore);
             for(int i=0;i<count;i++)if(Vehicle(overlaps[i])){Explode();break;}
         }
         bool Vehicle(Collider c){var u=c.GetComponentInParent<Unit>();return u&&!u.disabled&&(u is GroundVehicle||u is Aircraft);}

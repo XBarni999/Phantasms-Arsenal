@@ -9,11 +9,13 @@ namespace PhantasmsArsenal.ITGT
     {
         static float next;
         static string signature;
+        static string hardpointSignature;
         static string Quote(string value) => "\"" + (value ?? "").Replace("\"", "\"\"") + "\"";
         internal static void Update()
         {
             if (Time.realtimeSinceStartup < next) return;
             next = Time.realtimeSinceStartup + 10;
+            if (!CircuitBreaker.Plugin.InMission) ExportHardpoints();
             var weapons = Resources.FindObjectsOfTypeAll<WeaponInfo>().Where(w => w)
                 .OrderBy(w => w.weaponName).ThenBy(w => w.name).ToArray();
             if (weapons.Length < 10) return;
@@ -40,6 +42,39 @@ namespace PhantasmsArsenal.ITGT
                 Display.Trace("I-TGT loaded weapon inventory: " + rows.Length + " rows, " + path);
             }
             catch (Exception error) { Display.Trace("I-TGT inventory export: " + error.Message); }
+        }
+
+        // Export the loaded aircraft options for authoring Blueprinter ops in Unity.
+        static void ExportHardpoints()
+        {
+            var rows = new System.Collections.Generic.List<string>();
+            foreach (var aircraft in Resources.FindObjectsOfTypeAll<AircraftDefinition>())
+            {
+                if (!aircraft || !aircraft.unitPrefab || string.IsNullOrEmpty(aircraft.jsonKey)) continue;
+                var manager = aircraft.unitPrefab.GetComponentInChildren<WeaponManager>(true);
+                if (!manager || manager.hardpointSets == null) continue;
+                for (int index = 0; index < manager.hardpointSets.Length; index++)
+                {
+                    var group = manager.hardpointSets[index];
+                    if (group?.weaponOptions == null) continue;
+                    foreach (var mount in group.weaponOptions)
+                    {
+                        if (!mount || !mount.prefab || !mount.info || string.IsNullOrEmpty(mount.jsonKey)) continue;
+                        rows.Add(string.Join(",", new[] { aircraft.jsonKey, index.ToString(), group.name,
+                            mount.jsonKey, mount.ammo.ToString(), mount.missileBay ? "Yes" : "No" }.Select(Quote)));
+                    }
+                }
+            }
+            if (rows.Count == 0) return;
+            string content = "Aircraft,HardpointIndex,Hardpoint,Mount,Ammo,Internal\n" +
+                string.Join("\n", rows.Distinct().OrderBy(row => row, StringComparer.Ordinal)) + "\n";
+            if (content == hardpointSignature) return;
+            try
+            {
+                File.WriteAllText(Path.Combine(BepInEx.Paths.ConfigPath, "Phantasms-Arsenal-hardpoints.csv"), content);
+                hardpointSignature = content;
+            }
+            catch (Exception error) { Display.Trace("Arsenal hardpoint export: " + error.Message); }
         }
     }
 }

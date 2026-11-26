@@ -16,3 +16,5 @@ MonoBehaviour:
   aircraft:
   - aircraftJsonKey: Darkreach
     hardpointIndices: 010000000200000003000000
+  - aircraftJsonKey: PB22Trident
+    hardpointIndices: 0000000001000000

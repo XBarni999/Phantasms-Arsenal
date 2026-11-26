@@ -133,8 +133,7 @@ namespace Kinzhal
                     var manager=definition.unitPrefab.GetComponentInChildren<WeaponManager>(true);
                     if(aircraft&&manager)AddCentralPylon(aircraft,manager,mounts);
                     if(manager&&definition.aircraftParameters!=null){
-                        foreach(var loadout in definition.aircraftParameters.loadouts)
-                            while(loadout.weapons.Count<manager.hardpointSets.Length)loadout.weapons.Add(null);
+                        PadIfritLoadouts(aircraft,manager);
                         definitionsReady=manager.hardpointSets.Any(h=>h.name=="Killjoy Central Heavy Pylon");
                     }
                 }
@@ -144,7 +143,23 @@ namespace Kinzhal
             var aircraft=__instance.GetComponentInParent<Aircraft>();
             if(!aircraft||aircraft.definition.jsonKey!="Multirole1")return;
             AddCentralPylon(aircraft,__instance,Resources.FindObjectsOfTypeAll<WeaponMount>());
-            if(aircraft.loadout!=null)while(aircraft.loadout.weapons.Count<__instance.hardpointSets.Length)aircraft.loadout.weapons.Add(null);
+            PadIfritLoadouts(aircraft,__instance);
+        }
+        private static void PadIfritLoadouts(Aircraft aircraft, WeaponManager manager)
+        {
+            if (!aircraft || manager.hardpointSets.Length == 0 ||
+                manager.hardpointSets.Last().name != "Killjoy Central Heavy Pylon") return;
+
+            int count = manager.hardpointSets.Length;
+            void Pad(NuclearOption.SavedMission.Loadout loadout)
+            {
+                if (loadout?.weapons?.Count == count - 1) loadout.weapons.Add(null);
+            }
+
+            var defaults = aircraft.definition.aircraftParameters?.loadouts;
+            if (defaults != null)
+                foreach (var loadout in defaults) Pad(loadout);
+            Pad(aircraft.loadout);
         }
         private static void AddCentralPylon(Aircraft aircraft,WeaponManager manager,IEnumerable<WeaponMount> mounts)
         {

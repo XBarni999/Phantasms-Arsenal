@@ -33,9 +33,9 @@ Cargo pallets carry eight Apex-6 or four Apex-8 drones. After a ramp drop, they 
 
 ### AGM-180 Blackout — temporarily suppress air defenses
 
-Blackout carries a high-power microwave emitter. In native targeting mode, select an **enemy ground radar or SAM** before firing: targetless launches and ordinary tank targets are rejected. Alternatively, assign an I-TGT GPS mark and arm GPS to launch toward that coordinate. The missile remembers its original target or coordinate even if you change selection after launch.
+Blackout carries a high-power microwave emitter. In native targeting mode, select an **enemy ship, ground radar or SAM**. With I-TGT, assign a mark and arm GPS to launch toward that coordinate. Blackout remembers the original target or coordinate after launch.
 
-At the default settings, emission starts within 10 km of that target and lasts 20 seconds, affecting exposed receivers within 10 km of the moving missile. Terrain blocks exposure. It suppresses enemy ground electronics, radar, laser defenses and missile-defense targeting. It is intended to open a temporary attack window, rather than destroy a site with a large explosion; its impact charge is only 2 kg HE.
+At the default settings, emission starts within 10 km and lasts 20 seconds. Blackout heads toward an orbit around the designation and suppresses exposed electronics within 10 km. Terrain blocks exposure. The missile carries a 20 kg impact charge.
 
 **Friendly aircraft are affected too.** Aircraft of every faction in the emission zone lose radar contacts and remote datalink access. Local optical observations remain available. Electronics recover four seconds after their last exposure. Radar-guided launches can be restricted during the outage; optical, infrared, laser, inertial and unguided weapons retain their native launch behavior. After emission ends, Blackout attacks its remembered surviving target.
 
@@ -45,9 +45,9 @@ Locust is an unguided 400 kg dispenser delivered using CCIP. It deploys conventi
 
 ### CBU-82S Lawn Chair / Zhdan — sensor ambush
 
-Lawn Chair uses a similar dispenser body but carries eight Zhdan sensor mines. Unlike Locust contact mines, Zhdan waits for an enemy ground vehicle within 70 m and requires clear line of sight. It arms four seconds after landing; terrain, bridges and obstacles can prevent detection or attack.
+Lawn Chair carries eight Zhdan sensor mines. Zhdan scans for enemy ground vehicles within 90 m and requires a clear line of sight. It begins scanning five seconds after landing. Terrain, bridges and obstacles can prevent detection or attack.
 
-When a target is available, the mine checks its attack corridor, reserves the target, hops upward and hands off to a vanilla GS25 at an 80 m apex. Each mine gets one shot, and nearby mines coordinate target reservations. Unused mines expire after 300 seconds. Choose Lawn Chair to set a vehicle ambush, and Locust to lay a contact minefield. Zhdan is not a separate aircraft loadout item. Its hop, handoff and multiplayer behavior still require further mission testing.
+When a target is available, the mine checks its attack corridor, reserves the target, hops upward and hands off to a vanilla GS25 at a 40 m apex. Each mine gets one shot, and unused mines expire after 300 seconds. Locust and Lawn Chair have internal three-dispenser options for Darkreach, Alkyon and PB-22 Trident. PB-22 also has external triple racks.
 
 ## I-TGT GPS screen
 

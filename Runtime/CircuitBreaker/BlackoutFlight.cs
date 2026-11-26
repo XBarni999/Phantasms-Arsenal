@@ -3,11 +3,11 @@ namespace CircuitBreaker
 {
     public sealed class BlackoutFlight : MonoBehaviour
     {
-        Missile missile; Unit target; GlobalPosition point; bool designated,active,spent,unfolded,running;
-        float emissionEnd,nextEmission; Vector3 runVector; bool wreckHidden,launchCaptured;
+        Missile missile; Unit target; GlobalPosition point; bool designated,active,spent,unfolded;
+        float emissionEnd,nextEmission; bool wreckHidden,launchCaptured;
+        const float OrbitRadius = 2000f;
         readonly TerrainPreview terrain=new TerrainPreview();
         float pitch,lastGuide; bool pitchInitialized;
-        readonly System.Collections.Generic.List<Unit> terminalCandidates=new System.Collections.Generic.List<Unit>();
         static readonly System.Reflection.FieldInfo altitude=HarmonyLib.AccessTools.Field(typeof(OpticalSeekerCruiseMissile),"altitudeTarget");
         bool gps;
         static readonly System.Reflection.FieldInfo trim=HarmonyLib.AccessTools.Field(typeof(OpticalSeekerCruiseMissile),"altitudeTrim");
@@ -39,17 +39,15 @@ namespace CircuitBreaker
         }
         void BeginTerminal(){
             spent=true;active=false;
-            if(!target||target.disabled){
-                target=null;float nearest=Plugin.Radius.Value*Plugin.Radius.Value;
-                terminalCandidates.Clear();BattlefieldGrid.GetUnitsInRangeNonAlloc(missile.GlobalPosition(),Plugin.Radius.Value,terminalCandidates);
-                foreach(var candidate in terminalCandidates){
-                    if(!candidate||candidate.disabled||candidate is Missile||candidate is Aircraft||!candidate.NetworkHQ||candidate.NetworkHQ==missile.NetworkHQ)continue;
-                    float distance=(candidate.GlobalPosition()-missile.GlobalPosition()).sqrMagnitude;
-                    if(distance<nearest){nearest=distance;target=candidate;}
-                }
-                if(target)point=target.GlobalPosition();
-            }
             missile.Arm();
+        }
+        GlobalPosition OrbitWaypoint(Vector3 delta)
+        {
+            Vector3 radial = -delta;
+            if (radial.sqrMagnitude < 1f) radial = Vector3.ProjectOnPlane(-transform.forward, Vector3.up);
+            if (radial.sqrMagnitude < 1f) radial = Vector3.back;
+            Vector3 ahead = Quaternion.AngleAxis(35f, Vector3.up) * radial.normalized;
+            return point + ahead * OrbitRadius;
         }
         void FixedUpdate(){
             if(missile&&missile.disabled){HideWreck();return;}
@@ -74,12 +72,18 @@ namespace CircuitBreaker
                     Plugin.Diagnostic?.Invoke("Blackout HPM active at launch designation: "+(target?target.definition.jsonKey:"GPS")+", distance="+designatedDistance.ToString("F0")+" m, seconds="+Plugin.EmissionDuration.Value);
                 }
             }
-            if(!spent&&!running&&delta.magnitude<=2000){running=true;runVector=missile.rb?missile.rb.velocity:transform.forward;runVector.y=0;if(runVector.sqrMagnitude<1){runVector=transform.forward;runVector.y=0;}runVector.Normalize();}
             if(emissionEnd>0&&!spent){
                 if(Time.time>=emissionEnd)BeginTerminal();
             }
+            if (!gps && (!target || target.disabled) && (spent || emissionEnd == 0))
+            {
+                missile.SetTarget(null);
+                missile.Arm();
+                missile.Detonate(Vector3.up, false, false);
+                return;
+            }
             if(spent){missile.SetAimpoint(point,target?target.rb?.velocity??Vector3.zero:Vector3.zero);return;}
-            var desired=running?missile.GlobalPosition()+runVector*1200:point;
+            var desired = active || delta.sqrMagnitude <= OrbitRadius * OrbitRadius ? OrbitWaypoint(delta) : point;
             altitude.SetValue(seeker,35f);
             trim.SetValue(seeker,0f);
             var waypoint=seeker.TerrainWaypoint(desired);Vector3 raw=waypoint-missile.GlobalPosition();Vector3 toWaypoint=raw;toWaypoint.y=0;

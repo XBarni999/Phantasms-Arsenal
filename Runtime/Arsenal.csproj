@@ -2,12 +2,13 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Phantasms-Arsenal</AssemblyName>
-    <Version>1.1.5</Version>
+    <Version>1.1.12</Version>
     <LangVersion>latest</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GameDir Condition="'$(GameDir)' == ''">F:\Games\Nuclear.Option.v0.34.1</GameDir>
     <Managed>$(GameDir)\NuclearOption_Data\Managed</Managed>
     <BlueprinterProject Condition="'$(BlueprinterProject)' == ''">F:\NCMod\Blueprinter-Editor</BlueprinterProject>
+    <ArsenalBundle Condition="'$(ArsenalBundle)' == ''">..\Bundles\Phantasm's Arsenal_1.0.0.nobp</ArsenalBundle>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BepInEx">
@@ -109,6 +110,6 @@
     <Compile Include="ITGT\WeaponInventory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Bundles\Phantasm's Arsenal_1.0.0.nobp" LogicalName="Arsenal.Weapons.nobp" />
+    <EmbeddedResource Include="$(ArsenalBundle)" LogicalName="Arsenal.Weapons.nobp" />
   </ItemGroup>
 </Project>

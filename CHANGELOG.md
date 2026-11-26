@@ -1,5 +1,44 @@
 # Changelog
 
+## 1.1.12
+
+- Added internal racks carrying three Locust or Lawn Chair dispensers for Darkreach, Alkyon and PB-22 Trident.
+- Added external triple dispenser racks and Blackout options to compatible PB-22 stations.
+
+## 1.1.11
+
+- Added Blackout, Locust and Lawn Chair mounts for more mod aircraft using their recorded hardpoint options.
+
+## 1.1.10
+
+- Redesigned I-TGT around the map, next release designation, and a labeled toolbar with expandable weapon bindings.
+
+## 1.1.9
+
+- Added a configurable GPS arm/disarm hotkey with cockpit feedback.
+- Draw topography as a separate layer and reuse the loaded satellite tiles in I-TGT.
+
+## 1.1.8
+
+- Increased spherical trigger radius to 5 m for Locust and sensor range to 90 m for Zhdan.
+- Added an aircraft hardpoint inventory for authoring Blueprinter operations.
+
+## 1.1.7
+
+- Show GPS release steps and weapon-specific guidance in the I-TGT window.
+
+## 1.1.6
+
+- Simplified GPS arming and next-release feedback. Map mode is saved, and individual store bindings are under advanced controls.
+- Pad Ifrit presets and standard loadouts when the Killjoy pylon adds a final empty slot.
+- Spread Locust contact mines through the center of the drop zone and shorten the Zhdan jump before release.
+- Allow Blackout to engage ships, circle its designation during emission, and return to the original target with a 20 kg charge.
+
+## 1.0.1 — 2026-10-14 — hotfix
+
+- Reduced Blackout by 12% and raised its AGM mounts to prevent ground clipping on low pylons.
+- Spaced the Compass internal dual Lawn Chair mounts to prevent store and bay-wall clipping.
+
 ## 1.1.5 — 2026-10-08
 
 - Restricted GPS target markers and delivery cues to the cockpit camera.

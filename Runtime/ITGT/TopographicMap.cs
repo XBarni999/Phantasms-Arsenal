@@ -8,41 +8,80 @@ namespace PhantasmsArsenal.ITGT
     {
         const int Resolution = 2048;
         static readonly System.Reflection.FieldInfo MapDimensions = HarmonyLib.AccessTools.Field(typeof(DynamicMap), "mapDimensions");
-        readonly float[] heights = new float[Resolution * Resolution];
-        readonly bool[] ground = new bool[Resolution * Resolution];
+        float[] heights;
+        bool[] ground;
         Image image;
-        Sprite original, generated;
-        Color originalColor;
-        Color32[] basePixels, pixels;
+        RawImage reliefLayer;
+        Sprite original;
+        Color32[] pixels;
         readonly System.Diagnostics.Stopwatch frameBudget = new System.Diagnostics.Stopwatch();
         int row, shadedRow;
-        bool attached;
         public Texture2D Texture { get; private set; }
         public Vector2 Size { get; private set; }
         public bool Ready => Texture;
+        public Texture2D StandardTexture => original ? original.texture : null;
+        public Rect StandardUV(Rect uv)
+        {
+            Rect source = original.textureRect;
+            var texture = original.texture;
+            return new Rect((source.x + uv.x * source.width) / texture.width,
+                (source.y + uv.y * source.height) / texture.height,
+                uv.width * source.width / texture.width, uv.height * source.height / texture.height);
+        }
         public float Progress => (row * .75f + shadedRow * .25f) / Resolution;
+
+        public void DrawSatellite(Rect area, Rect view)
+        {
+            var satellite = image ? image.transform.Find("NuclearSatelliteMap") : null;
+            if (!satellite || !satellite.gameObject.activeInHierarchy) return;
+            Color previous = GUI.color;
+            try
+            {
+                for (int i = 0; i < satellite.childCount; i++)
+                {
+                    var tile = satellite.GetChild(i).GetComponent<RawImage>();
+                    if (!tile || !tile.isActiveAndEnabled || !tile.texture) continue;
+                    Vector2 min = tile.rectTransform.anchorMin, max = tile.rectTransform.anchorMax;
+                    float left = Mathf.Max(view.xMin, min.x), right = Mathf.Min(view.xMax, max.x);
+                    float bottom = Mathf.Max(view.yMin, min.y), top = Mathf.Min(view.yMax, max.y);
+                    if (left >= right || bottom >= top) continue;
+                    Rect uv = tile.uvRect;
+                    GUI.color = previous * tile.color;
+                    GUI.DrawTextureWithTexCoords(
+                        new Rect(area.x + (left - view.xMin) / view.width * area.width,
+                            area.y + (view.yMax - top) / view.height * area.height,
+                            (right - left) / view.width * area.width, (top - bottom) / view.height * area.height),
+                        tile.texture,
+                        new Rect(uv.x + (left - min.x) / (max.x - min.x) * uv.width,
+                            uv.y + (bottom - min.y) / (max.y - min.y) * uv.height,
+                            (right - left) / (max.x - min.x) * uv.width, (top - bottom) / (max.y - min.y) * uv.height));
+                }
+            }
+            finally { GUI.color = previous; }
+        }
 
         public void Update(DynamicMap map, bool replace)
         {
             var next = map && map.mapImage ? map.mapImage.GetComponent<Image>() : null;
             var dimensions = next ? (Vector2)MapDimensions.GetValue(map) : Vector2.zero;
-            if (!next || (original && image != next) || (image == next && next.sprite != original && next.sprite != generated) ||
-                (original && Size != dimensions))
+            if (image != next || Size != dimensions)
                 Dispose();
             if (!next || !next.sprite) return;
             if (!image)
             {
                 image = next;
-                original = image.sprite;
-                originalColor = image.color;
                 Size = dimensions;
                 if (Size.x <= 0 || Size.y <= 0) { Dispose(); return; }
-                CopyBaseImage();
-                row = 0;
             }
+            original = image.overrideSprite ? image.overrideSprite : image.sprite;
             // Bound both terrain sampling and relief shading; larger maps build across frames.
-            if (!Texture)
+            if (!Texture && replace)
             {
+                if (heights == null)
+                {
+                    heights = new float[Resolution * Resolution];
+                    ground = new bool[heights.Length];
+                }
                 frameBudget.Restart();
                 int end = Mathf.Min(row + 16, Resolution);
                 for (; row < end && frameBudget.ElapsedMilliseconds < 3; row++)
@@ -54,45 +93,29 @@ namespace PhantasmsArsenal.ITGT
                     }
                 if (row == Resolution) Build();
             }
-            if (Texture && replace && !attached)
+            if (Texture && replace)
             {
-                image.sprite = generated;
-                image.color = Color.white;
-                attached = true;
+                if (!reliefLayer) CreateLayer();
+                var satellite = image.transform.Find("NuclearSatelliteMap");
+                int index = satellite ? 1 : 0;
+                if (reliefLayer.transform.GetSiblingIndex() != index) reliefLayer.transform.SetSiblingIndex(index);
+                reliefLayer.enabled = true;
             }
-            else if (!replace && attached)
-            {
-                image.sprite = original;
-                image.color = originalColor;
-                attached = false;
-            }
-            // Native map mode/theme changes can reapply a translucent tint after attachment.
-            if (attached && image && image.sprite == generated) image.color = Color.white;
+            else if (reliefLayer) reliefLayer.enabled = false;
         }
 
-        void CopyBaseImage()
+        void CreateLayer()
         {
-            // The native image is often not CPU-readable. Read it through a render target.
-            var rt = RenderTexture.GetTemporary(Resolution, Resolution, 0);
-            var previous = RenderTexture.active;
-            Texture2D copy = null;
-            try
-            {
-                var source = original.textureRect;
-                Graphics.Blit(original.texture, rt, new Vector2(source.width / original.texture.width, source.height / original.texture.height),
-                    new Vector2(source.x / original.texture.width, source.y / original.texture.height));
-                RenderTexture.active = rt;
-                copy = new Texture2D(Resolution, Resolution, TextureFormat.RGBA32, false);
-                copy.ReadPixels(new Rect(0, 0, Resolution, Resolution), 0, 0);
-                copy.Apply();
-                basePixels = copy.GetPixels32();
-            }
-            finally
-            {
-                RenderTexture.active = previous;
-                RenderTexture.ReleaseTemporary(rt);
-                if (copy) Object.Destroy(copy);
-            }
+            var layer = new GameObject("I-TGT Topography", typeof(RectTransform), typeof(RawImage));
+            layer.layer = image.gameObject.layer;
+            var rect = (RectTransform)layer.transform;
+            rect.SetParent(image.transform, false);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            reliefLayer = layer.GetComponent<RawImage>();
+            reliefLayer.texture = Texture;
+            reliefLayer.raycastTarget = false;
         }
 
         public static bool Height(GlobalPosition position, out float elevation)
@@ -134,8 +157,6 @@ namespace PhantasmsArsenal.ITGT
                             Mathf.FloorToInt(h / 500) != Mathf.FloorToInt(heights[below] / 500);
                         if (contour) color = Color.Lerp(color, new Color(.39f, .32f, .22f), major ? .5f : .25f);
                     }
-                    // Retain native cartographic detail as a faint layer beneath the contour lines.
-                    if (basePixels != null) color *= Mathf.Lerp(.85f, 1.03f, ((Color)basePixels[i]).grayscale);
                     color.a = 1;
                     pixels[i] = color;
                 }
@@ -144,17 +165,16 @@ namespace PhantasmsArsenal.ITGT
             Texture = new Texture2D(Resolution, Resolution, TextureFormat.RGBA32, true) { name = "I-TGT Topography", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Trilinear, anisoLevel = 2 };
             Texture.SetPixels32(pixels);
             Texture.Apply(true, true);
-            generated = Sprite.Create(Texture, new Rect(0, 0, Resolution, Resolution), Vector2.one * .5f, original.pixelsPerUnit);
-            pixels = null; basePixels = null;
+            pixels = null; heights = null; ground = null;
         }
 
         public void Dispose()
         {
-            if (image && attached && image.sprite == generated) { image.sprite = original; image.color = originalColor; }
-            if (generated) Object.Destroy(generated);
+            if (reliefLayer) { reliefLayer.enabled = false; Object.Destroy(reliefLayer.gameObject); }
             if (Texture) Object.Destroy(Texture);
-            image = null; original = null; generated = null; Texture = null; basePixels = null; pixels = null;
-            attached = false; row = 0; shadedRow = 0; Size = Vector2.zero;
+            image = null; original = null; reliefLayer = null; Texture = null;
+            heights = null; ground = null; pixels = null;
+            row = 0; shadedRow = 0; Size = Vector2.zero;
         }
     }
 }

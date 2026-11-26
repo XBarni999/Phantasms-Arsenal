@@ -34,11 +34,24 @@ namespace PhantasmsArsenal.ITGT
 
         public static bool Supports(WeaponInfo info)
         {
-            if (!info || !info.weaponPrefab || (!info.bomb && !info.glideBomb && !info.missile)) return false;
+            if (!info || !info.weaponPrefab || info.gun || info.cargo || info.sling ||
+                (!info.bomb && !info.glideBomb && !info.missile)) return false;
+            if (info.name == "WI_Locust" || info.name == "WI_LawnChair") return false;
             var seeker = info.weaponPrefab.GetComponent<MissileSeeker>();
             // A bare MissileSeeker, high-drag dispenser or unguided bomb cannot steer.
             return seeker is OpticalSeekerBomb || seeker is OpticalSeeker || seeker is OpticalSeekerCruiseMissile ||
                 seeker is BallisticMissileGuidance || ((info.bomb || info.glideBomb) && seeker is LaserSeeker);
+        }
+
+        internal static string WeaponHint(WeaponInfo info)
+        {
+            if (!info) return "Use WEAPON to select a store.";
+            if (info.name == "WI_Locust" || info.name == "WI_LawnChair")
+                return "Unguided. Put the CCIP impact marker on the drop zone, then release.";
+            if (!Supports(info)) return "This weapon uses native targeting. Choose a GPS-compatible weapon.";
+            if (info.weaponPrefab.GetComponent<LaserSeeker>())
+                return "GPS flies toward the mark. Laser illumination is needed for terminal lock.";
+            return null;
         }
 
         public static void Install(Harmony harmony)

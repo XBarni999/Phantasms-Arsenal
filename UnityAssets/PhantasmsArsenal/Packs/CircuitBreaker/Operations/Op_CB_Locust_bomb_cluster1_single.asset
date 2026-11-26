@@ -24,6 +24,8 @@ MonoBehaviour:
     hardpointIndices: 0300000004000000
   - aircraftJsonKey: trainer
     hardpointIndices: 010000000200000003000000
+  - aircraftJsonKey: CASLight1
+    hardpointIndices: 000000000100000002000000030000000400000005000000
   - aircraftJsonKey: VTOLTrainer1
     hardpointIndices: 01000000020000000300000004000000
   - aircraftJsonKey: COIN
@@ -46,3 +48,15 @@ MonoBehaviour:
     hardpointIndices: 0400000005000000060000000700000008000000
   - aircraftJsonKey: XFS21
     hardpointIndices: 0300000004000000
+  - aircraftJsonKey: Aryx_PropAttacker1
+    hardpointIndices: 0100000002000000030000000400000005000000
+  - aircraftJsonKey: baanish_icarus
+    hardpointIndices: 01000000
+  - aircraftJsonKey: F4EPhantom
+    hardpointIndices: 02000000
+  - aircraftJsonKey: MiG21K
+    hardpointIndices: 0200000003000000
+  - aircraftJsonKey: mig29_Fulcrum
+    hardpointIndices: 010000000200000003000000
+  - aircraftJsonKey: mig29smt_Fulcrum
+    hardpointIndices: 010000000200000003000000

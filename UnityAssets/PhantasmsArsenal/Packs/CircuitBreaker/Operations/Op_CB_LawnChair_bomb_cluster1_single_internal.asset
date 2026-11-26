@@ -38,3 +38,5 @@ MonoBehaviour:
     hardpointIndices: 0200000003000000
   - aircraftJsonKey: XFS21
     hardpointIndices: 0100000002000000
+  - aircraftJsonKey: F4EPhantom
+    hardpointIndices: 01000000

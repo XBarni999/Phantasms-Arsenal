@@ -1,6 +1,6 @@
 # Circuit Breaker
 
-Current release: v0.1.21 (early testing). Locust deployment and Blackout suppression have been tested in missions. Lawn Chair sensor detection, the visible hop and GS25 handoff need further terrain and multiplayer testing.
+Current release: v0.1.22 (hotfix). Locust deployment and Blackout suppression have been tested in missions. Lawn Chair sensor detection, the visible hop and GS25 handoff need further terrain and multiplayer testing.
 
 Source code and documentation for a Nuclear Option tactical weapons mod. The playable pack is delivered as one `Circuit-Breaker.dll`, containing the gameplay runtime and an embedded Blueprinter bundle.
 
