@@ -10,7 +10,7 @@ An air-launched, two-stage aeroballistic missile for **Nuclear Option 0.34.1**. 
 - **Altitude-dependent range:** launching from a higher carrier increases the configured launch range, up to **360 km at 10 km altitude**. Minimum launch range is **48 km**.
 - **Animated warhead fins:** four fins unfold after separation and deflect with steering commands.
 - **FS-41 Eclipse:** HE and nuclear variants are available on its central pylon (requires the Eclipse aircraft mod).
-- **Carrier support:** KR-67 Ifrit carries **1** missile on a custom central heavy pylon; Alkyon AB-4 carries **2** externally; SFB-81 Darkreach carries **4** in its normal internal bays.
+- **Carrier support:** KR-67 Ifrit uses the central heavy pylon, Alkyon AB-4 uses its wing pylons, and SFB-81 Darkreach and PB-22 Trident use their forward and rear internal weapon bays. These stations support both HE and Nuclear variants.
 - **Native impact and damage:** contact checks exclude the missile's own colliders and trigger volumes, and cover movement between physics steps. The game's damage, penetration and fuse logic handles valid impacts.
 
 At a carrier speed of 250 m/s, the configured maximum launch ranges are:

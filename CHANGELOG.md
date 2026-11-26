@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.13
+
+- Added Killjoy HE and Nuclear to the PB-22 Trident's forward and rear internal weapon bays.
+- Updated the aircraft and weapon compatibility lists.
+
 ## 1.1.12
 
 - Added internal racks carrying three Locust or Lawn Chair dispensers for Darkreach, Alkyon and PB-22 Trident.

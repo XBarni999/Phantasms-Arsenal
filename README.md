@@ -25,6 +25,22 @@ The TEL variant is launched from a ground vehicle and uses a detachable booster 
 
 Killjoy is a heavy air-launched aeroballistic missile for long-range surface strikes. It accelerates through its motor stages, coasts along a guided lofted trajectory, then dives steeply onto the target. Launch altitude and aircraft speed affect its reach; there is no fixed minimum release altitude. Choose the conventional version for an explosive strike or the nuclear version for a nuclear strike. It requires a compatible heavy-missile station.
 
+| Aircraft | Killjoy HE and Nuclear stations |
+| --- | --- |
+| KR-67 Ifrit | Centerline heavy pylon |
+| Alkyon AB-4 | Wing pylons |
+| SFB-81 Darkreach | Forward and rear internal weapon bays |
+| FS-41 Eclipse | Centerline pylon |
+| PB-22 Trident | Forward and rear internal weapon bays |
+
+### PB-22 Trident weapon options
+
+| Weapon | Station |
+| --- | --- |
+| HSM-290 Killjoy HE and Nuclear | Forward and rear weapon bays |
+| CBU-82M Locust and CBU-82S Lawn Chair, three dispensers per mount | Forward and rear weapon bays, inner and outer pylon groups |
+| AGM-180 Blackout | Forward and rear weapon bays, inner and outer pylon groups |
+
 ### Apex — expendable attack drones
 
 Apex-6 is a low-altitude jet attack drone with a 38 kg shaped-charge/HE warhead. Apex-8 is the faster air-launched variant with a 68 kg shaped-charge/HE warhead. Select a surface target before launch; these are expendable attack weapons rather than reusable aircraft under player control.
